@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14171c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="مدرّب الشطرنج">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>مدرّب الشطرنج</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#14171c; --panel:#1c2129; --panel2:#232a34; --line:#2e3742; --text:#e9edf2; --muted:#9aa6b4;
+  --accent:#f2b84b; --accent2:#e59a1e; --good:#5fb85f; --exc:#86c96b; --ok:#a9c27a; --inacc:#e6c34a; --mist:#ec8b3a; --blun:#e3524b; --blue:#5aa2e8;
+  --light:#ecdcbf; --dark:#ad8a64;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Tajawal,system-ui,sans-serif;font-size:16px;line-height:1.55}
+button{font-family:inherit;font-size:15px;cursor:pointer}
+.wrap{max-width:560px;margin:0 auto;padding:calc(12px + env(safe-area-inset-top)) 12px calc(92px + env(safe-area-inset-bottom))}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 2px 12px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px}
+.brand .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center}
+.brand .logo svg{width:22px;height:22px}
+.pill{font-size:12px;padding:3px 9px;border-radius:99px;background:var(--panel2);color:var(--muted);white-space:nowrap}
+.pill.ok{color:#bfe8bf}.pill.bad{color:#f3b0ac}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.card h2{font-size:17px;margin:0 0 10px;font-weight:800}
+.card h3{font-size:15px;margin:12px 0 6px}
+.muted{color:var(--muted)} .small{font-size:13px}
+.btn{border:0;border-radius:12px;padding:11px 14px;background:var(--panel2);color:var(--text);font-weight:700}
+.btn.primary{background:var(--accent);color:#1b1406}
+.btn.ghost{background:transparent;border:1px solid var(--line)}
+.btn.danger{background:#4a2224;color:#ffd0cc}
+.btn.block{width:100%}
+.btn:disabled{opacity:.5}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.grow{flex:1}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.kpi{background:var(--panel2);border-radius:12px;padding:10px 12px}
+.kpi b{display:block;font-size:24px;font-weight:800;direction:ltr;text-align:right}
+.kpi span{font-size:12.5px;color:var(--muted)}
+textarea,input[type=text],select{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;font-family:inherit;font-size:15px}
+textarea{min-height:110px;direction:ltr;text-align:left;font-family:ui-monospace,monospace;font-size:12px}
+nav.tabs{position:fixed;bottom:0;left:0;right:0;background:#0f1216ee;backdrop-filter:blur(8px);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:20}
+nav.tabs .in{display:flex;max-width:560px;width:100%}
+nav.tabs button{flex:1;background:none;border:0;color:var(--muted);padding:9px 2px calc(12px + env(safe-area-inset-bottom));font-size:12px;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
+nav.tabs button.on{color:var(--accent)}
+nav.tabs svg{width:22px;height:22px}
+nav.tabs .badge{position:absolute;top:4px;left:calc(50% - 22px);background:var(--blun);color:#fff;font-size:10px;border-radius:99px;padding:0 5px;min-width:16px}
+.view{display:none}.view.on{display:block}
+/* board */
+.boardwrap{direction:ltr;display:flex;gap:6px;align-items:stretch;margin:0 auto 10px;max-width:500px}
+.evalbar{width:16px;border-radius:6px;overflow:hidden;background:#3a3f46;position:relative;flex:none}
+.evalbar .w{position:absolute;left:0;right:0;bottom:0;background:#f1f1f1;transition:height .3s}
+.evalbar .t{position:absolute;left:0;right:0;font-size:9px;text-align:center;font-weight:700;z-index:2}
+.board{position:relative;flex:1;aspect-ratio:1/1;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);border-radius:8px;overflow:hidden;user-select:none;touch-action:manipulation}
+.sq{position:relative;display:grid;place-items:center}
+.sq.l{background:var(--light)}.sq.d{background:var(--dark)}
+.sq.last::before{content:"";position:absolute;inset:0;background:rgba(242,200,60,.42)}
+.sq.sel::before{content:"";position:absolute;inset:0;background:rgba(90,162,232,.5)}
+.sq.chk::before{content:"";position:absolute;inset:0;background:radial-gradient(circle,rgba(230,40,40,.9) 0,rgba(230,40,40,.4) 55%,transparent 75%)}
+.sq.bad::before{content:"";position:absolute;inset:0;background:rgba(227,82,75,.55)}
+.sq.goodsq::before{content:"";position:absolute;inset:0;background:rgba(95,184,95,.55)}
+.sq.hint::before{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 4px #5aa2e8}
+.sq .dot{position:absolute;width:30%;height:30%;border-radius:50%;background:rgba(20,30,40,.28);z-index:3;pointer-events:none}
+.sq .ring{position:absolute;inset:4%;border-radius:50%;border:5px solid rgba(20,30,40,.28);z-index:3;pointer-events:none}
+.sq .pc{width:88%;height:88%;position:relative;z-index:2;pointer-events:none}
+.pc.w path{fill:#fbfbfb;stroke:#1b1b1b;stroke-width:1.15;paint-order:stroke;stroke-linejoin:round}
+.pc.b path{fill:#262626;stroke:#000;stroke-width:.5;stroke-linejoin:round}
+.sq .cf,.sq .cr{position:absolute;font-size:9px;font-weight:700;z-index:1;font-family:system-ui}
+.sq .cf{right:2px;bottom:0}.sq .cr{left:2px;top:0}
+.sq.l .cf,.sq.l .cr{color:var(--dark)}.sq.d .cf,.sq.d .cr{color:var(--light)}
+.board svg.arrows{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
+.navbtns{direction:ltr;display:flex;gap:6px;max-width:500px;margin:0 auto 10px}
+.navbtns button{flex:1;padding:10px 0;font-size:18px}
+/* moves */
+.moves{direction:ltr;display:grid;grid-template-columns:38px 1fr 1fr;gap:2px 4px;max-height:220px;overflow:auto;font-size:14px;padding:4px;background:var(--bg);border-radius:10px}
+.moves .n{color:var(--muted);text-align:right;padding:4px 2px}
+.moves .m{padding:4px 6px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px;justify-content:space-between}
+.moves .m.cur{background:var(--panel2);outline:1px solid var(--accent)}
+.cls{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:99px;font-size:11px;font-weight:800;color:#111;padding:0 4px}
+.c-best{background:var(--good)}.c-excellent{background:var(--exc)}.c-good{background:var(--ok)}.c-inacc{background:var(--inacc)}.c-mistake{background:var(--mist)}.c-blunder{background:var(--blun);color:#fff}.c-book{background:#8a7a5c}.c-forced{background:#6b7480;color:#fff}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--panel2);color:var(--muted);margin:2px 0 2px 4px}
+.tag.hot{background:#3b2420;color:#ffb8a8}
+.infobox{background:var(--panel2);border-radius:12px;padding:10px 12px;margin-bottom:10px;min-height:64px}
+.infobox .san{direction:ltr;display:inline-block;font-weight:800}
+.ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+.graph{width:100%;height:86px;display:block;background:var(--bg);border-radius:10px;cursor:pointer}
+/* lists */
+.game{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line)}
+.game:last-child{border-bottom:0}
+.res{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none}
+.res.W{background:#24412a;color:#9fe0a5}.res.L{background:#4a2224;color:#ffb3ad}.res.D{background:#3a3a3a;color:#ddd}.res.U{background:#333;color:#aaa}
+.game .who{flex:1;min-width:0}
+.game .who b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acc{font-weight:800;direction:ltr}
+.bar{height:9px;background:var(--bg);border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:99px}
+.statrow{display:grid;grid-template-columns:92px 1fr 46px;gap:8px;align-items:center;margin:7px 0;font-size:14px}
+.statrow .v{direction:ltr;text-align:left;font-weight:700}
+table.t{width:100%;border-collapse:collapse;font-size:13.5px}
+table.t th{color:var(--muted);font-weight:500;text-align:right;padding:6px 4px;border-bottom:1px solid var(--line)}
+table.t td{padding:7px 4px;border-bottom:1px solid var(--line)}
+.weak{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.weak:last-child{border-bottom:0}
+.weak .ic{width:34px;height:34px;flex:none;border-radius:10px;display:grid;place-items:center;font-size:17px}
+.weak b{display:block}
+.progress{height:8px;background:var(--bg);border-radius:99px;overflow:hidden;margin:8px 0}
+.progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .2s}
+.fb{padding:10px 12px;border-radius:12px;margin-bottom:10px;font-weight:700}
+.fb.ok{background:#1f3a24;color:#b6f0bb}.fb.bad{background:#40201f;color:#ffc0b8}.fb.info{background:var(--panel2)}
+.ai{background:#1a2230;border:1px solid #2c3d57;border-radius:12px;padding:10px 12px;margin-top:8px;white-space:pre-wrap;font-size:14.5px;display:none}
+.ai.on{display:block}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.chip{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:99px;padding:5px 12px;font-size:13px}
+.chip.on{background:var(--accent);color:#1b1406;border-color:var(--accent);font-weight:700}
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:#000c;color:#fff;padding:9px 16px;border-radius:12px;font-size:14px;z-index:50;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%}
+.toast.on{opacity:1}
+.empty{text-align:center;padding:26px 10px}
+.empty .big{font-size:42px}
+details summary{cursor:pointer;color:var(--accent);font-weight:700}
+ol.steps{padding-inline-start:20px;margin:6px 0}
+ol.steps li{margin:4px 0}
+.spark{width:100%;height:60px;display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><div class="logo"><svg viewBox="0 0 24 24"><path fill="#1b1406" d="M19 22H5v-2h14zM13 2c-1.25 0-2.42.62-3.11 1.66L7 8l2 2 2.06-1.37c.44-.31 1.08-.19 1.39.27.02.03.05.06.05.1.3.59.19 1.3-.28 1.77l-4.8 4.8c-.55.56-.55 1.46.01 2.01.26.26.62.42.99.42H17V6a4 4 0 0 0-4-4"/></svg></div>مدرّب الشطرنج</div>
+    <div class="row"><span id="engPill" class="pill">المحرك: يُحمَّل…</span><span id="savePill" class="pill">محلي</span></div>
+  </header>
+
+  <!-- HOME -->
+  <section class="view on" id="v-home"></section>
+
+  <!-- GAMES -->
+  <section class="view" id="v-games">
+    <div class="card" id="analyzeCard" style="display:none">
+      <div class="row"><b class="grow" id="anTitle">جاري التحليل…</b><button class="btn ghost" id="anStop">إيقاف</button></div>
+      <div class="progress"><i id="anBar"></i></div>
+      <div class="small muted" id="anSub"></div>
+    </div>
+    <div class="card">
+      <h2>اسحب مبارياتك من تشز دوت كوم</h2>
+      <div class="row">
+        <input type="text" id="ccUser" placeholder="اسم حسابك" autocomplete="off" autocapitalize="off" style="direction:ltr;text-align:left;flex:1;min-width:140px">
+        <select id="ccMonths" style="width:auto"><option value="1">آخر شهر</option><option value="3" selected>آخر 3 أشهر</option><option value="6">آخر 6 أشهر</option><option value="999">الكل</option></select>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <select id="ccType" style="flex:1"><option value="rapid" selected>رابيد فقط</option><option value="blitz">بليتز فقط</option><option value="all">كل الأنواع (عدا اليومي)</option></select>
+        <button class="btn primary" id="ccFetch">اسحب</button>
+      </div>
+      <div class="small muted" id="ccStatus" style="margin-top:6px"></div>
+    </div>
+    <div class="card">
+      <h2>أو استورد ملف PGN</h2>
+      <p class="small muted" style="margin-top:0">الصق نص PGN (مباراة أو أكثر) أو اختر ملف ‎.pgn‎ نزّلته من تشز دوت كوم.</p>
+      <textarea id="pgnIn" placeholder='[Event "Live Chess"]&#10;[White "..."]&#10;1. e4 e5 2. Nf3 ...'></textarea>
+      <div class="row" style="margin-top:8px">
+        <button class="btn primary grow" id="importBtn">استيراد</button>
+        <label class="btn ghost" style="display:inline-block">ملف PGN<input type="file" id="pgnFile" accept=".pgn,.txt,text/plain" multiple hidden></label>
+      </div>
+      <details style="margin-top:10px"><summary>كيف أنزّل مبارياتي من تشز دوت كوم مجانًا؟</summary>
+        <ol class="steps small">
+          <li><b>عدة مباريات دفعة واحدة:</b> افتح chess.com من المتصفح ← قائمة Play ← <b>Archive</b> (أرشيف المباريات) ← حدّد المباريات بالمربعات ← اضغط زر التنزيل، فيصلك ملف ‎.pgn‎ ترفعه هنا.</li>
+          <li><b>مباراة واحدة:</b> افتح المباراة ← زر المشاركة (Share) ← تبويب PGN ← نسخ، ثم الصقه في المربع أعلاه.</li>
+          <li>اكتب اسم حسابك في <b>الإعدادات</b> حتى يعرف التطبيق أيّ لون كنت تلعب (أو يتعرّف عليه تلقائيًا).</li>
+        </ol>
+      </details>
+    </div>
+    <div class="card">
+      <div class="row" style="margin-bottom:6px"><h2 class="grow" style="margin:0">مبارياتي</h2><button class="btn primary" id="analyzeAll">حلّل الكل</button></div>
+      <div id="gameList"></div>
+    </div>
+  </section>
+
+  <!-- REVIEW -->
+  <section class="view" id="v-review">
+    <div class="row" style="margin-bottom:10px"><button class="btn ghost" id="revBack">→ رجوع</button><div class="grow small muted" id="revTitle"></div></div>
+    <div class="boardwrap"><div class="evalbar" id="revEval"><div class="w"></div><div class="t"></div></div><div id="revBoard"></div></div>
+    <div class="navbtns"><button class="btn" data-nav="first">⏮</button><button class="btn" data-nav="prev">◀</button><button class="btn" data-nav="next">▶</button><button class="btn" data-nav="last">⏭</button><button class="btn" data-nav="flip" title="قلب الرقعة">⇅</button></div>
+    <div class="infobox" id="revInfo"></div>
+    <svg class="graph" id="revGraph" viewBox="0 0 300 80" preserveAspectRatio="none"></svg>
+    <div class="row small muted" style="margin:8px 0 6px"><span class="grow" id="revAcc"></span><span id="revCounts"></span></div>
+    <div class="moves" id="revMoves"></div>
+  </section>
+
+  <!-- TRAIN -->
+  <section class="view" id="v-train">
+    <div id="trainHome"></div>
+    <div id="trainPlay" style="display:none">
+      <div class="row" style="margin-bottom:8px"><button class="btn ghost" id="pzExit">→ إنهاء</button><span class="grow"></span><span class="pill" id="pzCount"></span></div>
+      <div class="fb info" id="pzMsg"></div>
+      <div class="boardwrap"><div id="pzBoard"></div></div>
+      <div class="row" style="margin-bottom:8px">
+        <button class="btn grow" id="pzHint">💡 تلميح</button>
+        <button class="btn grow" id="pzShow">أظهر الحل</button>
+        <button class="btn primary grow" id="pzNext" style="display:none">التالي ←</button>
+      </div>
+      <div class="row"><button class="btn ghost grow" id="pzExplain" style="display:none">🤖 اشرح لي الفكرة</button><button class="btn ghost grow" id="pzGame">افتح المباراة</button></div>
+      <div class="ai" id="pzAI"></div>
+      <div class="small muted" id="pzMeta" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="view" id="v-settings">
+    <div class="card">
+      <h2>الإعدادات</h2>
+      <label class="small muted">اسم حسابك في تشز دوت كوم</label>
+      <input type="text" id="setUser" placeholder="مثال: ahmad_123" autocomplete="off" style="direction:ltr;text-align:left;margin:4px 0 12px">
+      <label class="small muted">عمق التحليل</label>
+      <select id="setDepth" style="margin:4px 0 12px">
+        <option value="10">سريع (عمق 10) — مناسب للجوال</option>
+        <option value="12">متوازن (عمق 12)</option>
+        <option value="14">عميق (عمق 14) — أبطأ وأدق</option>
+      </select>
+      <button class="btn primary block" id="saveSet">حفظ</button>
+    </div>
+    <div class="card" id="installCard">
+      <h2>ثبّت التطبيق</h2>
+      <div id="installBody" class="small"></div>
+    </div>
+    <div class="card">
+      <h2>بياناتك</h2>
+      <p class="small muted" id="dataInfo" style="margin-top:0"></p>
+      <div class="row"><button class="btn grow" id="exportBtn">نسخ نسخة احتياطية</button><button class="btn grow" id="importBkBtn">استعادة نسخة</button></div>
+      <textarea id="bkArea" style="display:none;margin-top:8px" placeholder="الصق النسخة الاحتياطية هنا ثم اضغط استعادة"></textarea>
+      <button class="btn danger block" id="wipeBtn" style="margin-top:10px">حذف كل البيانات</button>
+      <div id="wipeConfirm" style="display:none;margin-top:8px" class="row"><span class="grow small">متأكد؟ لا يمكن التراجع.</span><button class="btn danger" id="wipeYes">نعم احذف</button><button class="btn" id="wipeNo">إلغاء</button></div>
+    </div>
+    <div class="card small muted">
+      المحرك: Stockfish (مفتوح المصدر، GPL) يعمل داخل جهازك، والتطبيق يعمل بدون إنترنت بعد أول فتح. مبارياتك تُقرأ من واجهة تشز دوت كوم العامة المجانية ولا يُرسل أي شيء لأي جهة.
+    </div>
+  </section>
+</div>
+
+<nav class="tabs"><div class="in">
+  <button data-tab="home" class="on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3zm0 8h8v-6H3zm10 0h8V11h-8zm0-18v6h8V3z"/></svg>لوحتي</button>
+  <button data-tab="games"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 22H5v-2h14zM17 2v3h-2V2h-2v3h-2V2H9v3H7V2H5v6h2v10h10V8h2V2z"/></svg>مبارياتي</button>
+  <button data-tab="train"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>تمارين<span class="badge" id="dueBadge" style="display:none"></span></button>
+  <button data-tab="settings"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7m7.43-2.53c.04-.32.07-.64.07-.97s-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1s.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64z"/></svg>الإعدادات</button>
+</div></nav>
+<div class="toast" id="toast"></div>
+
+<script>
+function loadChessLib(){ return new Promise(res=>{ const urls=['lib/chess.min.js','https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js','https://cdn.jsdelivr.net/npm/chess.js@0.10.3/chess.min.js'];
+  const next=i=>{ if (typeof Chess!=='undefined' || i>=urls.length) return res(); const sc=document.createElement('script'); sc.src=urls[i]; sc.onload=()=>typeof Chess!=='undefined'? res() : next(i+1); sc.onerror=()=>next(i+1); document.head.appendChild(sc); };
+  next(0); }); }
+window.chessLibReady = loadChessLib();
+</script>
+<script>
+'use strict';
+/* ================= utilities ================= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const START = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function hash(s){let h1=0xdeadbeef,h2=0x41c6ce57;for(let i=0;i<s.length;i++){const ch=s.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (h2>>>0).toString(36)+(h1>>>0).toString(36);}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function withTimeout(p, ms){ return Promise.race([p, new Promise(r => setTimeout(() => r(null), ms))]); }
+let toastT; function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),2600); }
+const MATE = 100000;
+function wp(cp){ if (cp==null) return 50; const c=Math.max(-1500,Math.min(1500,cp)); return 50+50*(2/(1+Math.exp(-0.00368208*c))-1); }
+function wpFor(cpWhite, color){ const w=wp(cpWhite); return color==='w'?w:100-w; }
+function fmtEval(v){ if(v==null) return '–'; if(Math.abs(v)>=MATE-1000){ const n=MATE-Math.abs(v); return (v>0?'':'-')+'M'+n; } const p=v/100; return (p>0?'+':'')+p.toFixed(1); }
+function moveAcc(loss){ return Math.max(0,Math.min(100,103.1668*Math.exp(-0.04354*loss)-3.1669)); }
+function avg(a){ return a.length? a.reduce((x,y)=>x+y,0)/a.length : 0; }
+function gameAccuracy(accs){ if(!accs.length) return null; const ar=avg(accs); const hm=accs.length/accs.reduce((s,a)=>s+1/Math.max(a,5),0); return (ar+hm)/2; }
+const pct = (a,b) => b? Math.round(100*a/b) : 0;
+
+/* ================= pieces ================= */
+const PIECE_PATHS = {
+  k:'M19 22H5v-2h14zm-2-12c-1.42 0-2.74.77-3.45 2H13V7h3V5h-3V2h-2v3H8v2h3v5h-.55C9.35 10.09 6.9 9.43 5 10.54A4.013 4.013 0 0 0 3.5 16c.74 1.240 2.07 2 3.5 2h10a4 4 0 0 0 4-4 4 4 0 0 0-4-4',
+  q:'M18 3a2 2 0 0 1 2 2c0 .81-.5 1.5-1.17 1.82L17 13.15V18H7v-4.85L5.17 6.82C4.5 6.5 4 5.81 4 5a2 2 0 0 1 2-2 2 2 0 0 1 2 2c0 .5-.18.95-.5 1.3l2.8 3.05.53-3.730C10.33 5.26 10 4.67 10 4a2 2 0 0 1 2-2 2 2 0 0 1 2 2c0 .67-.33 1.26-.83 1.62l.53 3.73 2.77-3.06A2 2 0 0 1 16 5a2 2 0 0 1 2-2M5 20h14v2H5z',
+  r:'M5 20h14v2H5zM17 2v3h-2V2h-2v3h-2V2H9v3H7V2H5v6h2v10h10V8h2V2z',
+  b:'M19 22H5v-2h14zM17.16 8.26A8.94 8.94 0 0 1 19 13c0 2.76-3.13 5-7 5s-7-2.24-7-5c0-2.38 2.33-6.61 5.46-7.73-.3-.36-.46-.81-.46-1.27a2 2 0 0 1 2-2 2 2 0 0 1 2 2c0 .46-.16.91-.46 1.27.86.33 1.64.83 2.3 1.47l-4.55 4.55 1.42 1.42z',
+  n:'M19 22H5v-2h14zM13 2c-1.25 0-2.42.62-3.11 1.66L7 8l2 2 2.06-1.37c.44-.31 1.08-.19 1.39.27.02.03.05.06.05.1.3.59.19 1.3-.28 1.770l-4.8 4.8c-.55.56-.55 1.46.01 2.01.26.26.62.42.99.42H17V6a4 4 0 0 0-4-4',
+  p:'M19 22H5v-2h14zm-3-4H8l2.18-8H8V8h2.72l.07-.26A2.970 2.970 0 0 1 9.25 6.2c-.67-1.52.02-3.29 1.54-3.95 1.52-.67 3.29.02 3.95 1.54a2.990 2.990 0 0 1-1.54 3.95l.07.26H16v2h-2.18z'
+};
+const pieceSvg = (t,c) => `<svg class="pc ${c}" viewBox="1.5 0.5 21 23"><path d="${PIECE_PATHS[t]}"/></svg>`;
+
+/* ================= board view ================= */
+class BoardView {
+  constructor(el){
+    this.el = el; el.classList.add('board'); this.sqs = {};
+    for (let i=0;i<64;i++){ const d=document.createElement('div'); d.className='sq'; el.appendChild(d); }
+    this.svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    this.svg.setAttribute('viewBox','0 0 8 8'); this.svg.classList.add('arrows'); el.appendChild(this.svg);
+    el.addEventListener('click', e => { const s=e.target.closest('.sq'); if(s) this._click(s.dataset.sq); });
+    this.fen = START; this.flip=false; this.opts={};
+  }
+  set(fen, o={}){ this.fen=fen; this.flip=!!o.flip; this.opts=o; this.sel=null; this.render(); }
+  sqName(r,f){ const file=this.flip?7-f:f, rank=this.flip?r+1:8-r; return 'abcdefgh'[file]+rank; }
+  pos(sq){ const file=sq.charCodeAt(0)-97, rank=+sq[1]; const f=this.flip?7-file:file, r=this.flip?rank-1:8-rank; return [f+.5, r+.5]; }
+  render(){
+    let c; try { c = new Chess(this.fen); } catch(e){ return; }
+    this.chess = c;
+    const o=this.opts, kids=this.el.children; const targets = this.sel ? c.moves({square:this.sel, verbose:true}) : [];
+    const inChk = c.in_check() ? c.turn() : null;
+    for (let r=0;r<8;r++) for (let f=0;f<8;f++){
+      const d=kids[r*8+f], name=this.sqName(r,f), p=c.get(name);
+      const light=((name.charCodeAt(0)-97)+(+name[1]))%2===1;
+      let cls='sq '+(light?'l':'d');
+      if (o.last && (o.last.from===name||o.last.to===name)) cls+=' last';
+      if (this.sel===name) cls+=' sel';
+      if (o.marks && o.marks[name]) cls+=' '+o.marks[name];
+      if (inChk && p && p.type==='k' && p.color===inChk) cls+=' chk';
+      d.className=cls; d.dataset.sq=name;
+      let h = p ? pieceSvg(p.type, p.color) : '';
+      const t = targets.find(m=>m.to===name);
+      if (t) h += p ? '<span class="ring"></span>' : '<span class="dot"></span>';
+      if (f===0) h += `<span class="cr">${name[1]}</span>`;
+      if (r===7) h += `<span class="cf">${name[0]}</span>`;
+      d.innerHTML = h;
+    }
+    this.drawArrows(o.arrows||[]);
+  }
+  drawArrows(list){
+    const col={g:'#3fa34d',r:'#d9453d',b:'#3d86d9',y:'#e0a020'};
+    let h='<defs>'+Object.entries(col).map(([k,v])=>`<marker id="ah${k}${this.uid||(this.uid=Math.random().toString(36).slice(2,7))}" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="2.6" markerHeight="2.6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="${v}"/></marker>`).join('')+'</defs>';
+    for (const a of list){
+      if (!a || !a.from || !a.to) continue;
+      const [x1,y1]=this.pos(a.from), [x2,y2]=this.pos(a.to); const dx=x2-x1, dy=y2-y1, L=Math.hypot(dx,dy)||1; const ex=x2-dx/L*.32, ey=y2-dy/L*.32;
+      h+=`<line x1="${x1}" y1="${y1}" x2="${ex}" y2="${ey}" stroke="${col[a.c||'g']}" stroke-width=".17" stroke-linecap="round" opacity=".85" marker-end="url(#ah${a.c||'g'}${this.uid})"/>`;
+    }
+    this.svg.innerHTML=h;
+  }
+  _click(sq){
+    if (!this.opts.interactive || !this.chess) return;
+    const c=this.chess, p=c.get(sq);
+    if (this.sel){
+      const mv = c.moves({square:this.sel, verbose:true}).find(m=>m.to===sq);
+      if (mv){ const from=this.sel; this.sel=null; this.render(); this.opts.onMove && this.opts.onMove({from, to:sq, promotion: mv.flags.includes('p')?'q':undefined}); return; }
+    }
+    if (p && p.color===c.turn() && (!this.opts.color || this.opts.color===p.color)){ this.sel = (this.sel===sq?null:sq); } else this.sel=null;
+    this.render();
+  }
+}
+
+/* ================= PGN parsing ================= */
+function splitPgn(text){
+  text = text.replace(/\r/g,'').replace(/﻿/g,'');
+  return text.split(/\n(?=\s*\[Event\s)/).map(s=>s.trim()).filter(s=>s.length>5);
+}
+function clkSecs(c){ const m=c.match(/\[%clk\s+([\d:.]+)\]/); if(!m) return null; const p=m[1].split(':').map(Number); let s=0; for(const x of p) s=s*60+x; return s; }
+function tokenize(mt){
+  const moves=[], clks=[]; let i=0, depth=0; const s=mt;
+  while (i<s.length){
+    const ch=s[i];
+    if (ch==='{'){ let j=s.indexOf('}',i); if(j<0) j=s.length; if(depth===0 && moves.length){ const c=clkSecs(s.slice(i+1,j)); if(c!=null) clks[moves.length-1]=c; } i=j+1; continue; }
+    if (ch===';'){ let j=s.indexOf('\n',i); i = j<0? s.length : j+1; continue; }
+    if (ch==='('){ depth++; i++; continue; }
+    if (ch===')'){ depth=Math.max(0,depth-1); i++; continue; }
+    if (/\s/.test(ch)){ i++; continue; }
+    let j=i; while (j<s.length && !/[\s{}();]/.test(s[j])) j++;
+    let tok=s.slice(i,j); i=j;
+    if (depth>0) continue;
+    if (/^\$\d+$/.test(tok)) continue;
+    tok = tok.replace(/^\d+\.+/,'');
+    if (!tok || /^(1-0|0-1|1\/2-1\/2|\*)$/.test(tok)) continue;
+    moves.push(tok);
+  }
+  return {moves, clks};
+}
+function playSan(c, san){
+  let s = san.replace(/[!?]+$/,'');
+  if (/^0-0(-0)?[+#]?$/.test(s)) s = s.replace(/0/g,'O');
+  let m=null; try { m = c.move(s, {sloppy:true}); } catch(e){}
+  if (m) return m;
+  const norm = x => x.replace(/[+#x=!?]/g,'');
+  const target = norm(s); const f = c.moves({verbose:true}).find(v=>norm(v.san)===target);
+  return f ? c.move(f) : null;
+}
+function nonPawnMat(fen){ let m=0; for (const ch of fen.split(' ')[0]){ const l=ch.toLowerCase(); if(l==='n'||l==='b') m+=3; else if(l==='r') m+=5; else if(l==='q') m+=9; } return m; }
+function openingName(h){
+  if (h.Opening) return h.Opening;
+  if (h.ECOUrl){ const seg=decodeURIComponent(h.ECOUrl.split('/').pop()||''); return seg.replace(/-/g,' ').replace(/\s*\d+\..*$/,'').trim() || h.ECO || ''; }
+  return h.ECO || '';
+}
+function openingFamily(name){
+  if (!name) return 'غير معروف';
+  const w=name.split(/\s+/); const k=w.findIndex(x=>/^(Defense|Defence|Opening|Game|Gambit|Attack|System|Variation)$/i.test(x));
+  return (k>=0? w.slice(0,k+1) : w.slice(0,3)).join(' ');
+}
+function parseGame(txt){
+  const h={};
+  const rest = txt.replace(/^\s*\[(\w+)\s+"((?:[^"\\]|\\.)*)"\]\s*$/gm,(m,k,v)=>{ h[k]=v; return ''; });
+  const {moves, clks} = tokenize(rest);
+  const fen0 = (h.FEN && h.SetUp!=='0') ? h.FEN : START;
+  let c; try { c = new Chess(fen0); } catch(e){ return null; }
+  const sans=[], ucis=[], clk=[]; let ph='';
+  for (let i=0;i<moves.length;i++){
+    const before = c.fen(); const mat=nonPawnMat(before);
+    const m = playSan(c, moves[i]); if (!m) break;
+    ph += mat<=26 ? 'e' : (i<20 ? 'o' : 'm');
+    sans.push(m.san); ucis.push(m.from+m.to+(m.promotion||'')); clk.push(clks[i]??null);
+  }
+  if (!sans.length) return null;
+  const tc=(h.TimeControl||'').split('+'); const base=parseInt(tc[0])||0, inc=parseInt(tc[1])||0;
+  const date = (h.UTCDate||h.Date||'').replace(/\./g,'-') + (h.UTCTime? ' '+h.UTCTime : (h.EndTime? ' '+h.EndTime:''));
+  const key = 'g'+hash(h.Link || (h.White+'|'+h.Black+'|'+date+'|'+ucis.slice(0,30).join('')));
+  const op = openingName(h);
+  return { key, white:h.White||'?', black:h.Black||'?', welo:h.WhiteElo||'', belo:h.BlackElo||'', result:h.Result||'*', date, base, inc,
+    tcRaw:h.TimeControl||'', link:h.Link||'', opening:op, family:openingFamily(op), term:h.Termination||'',
+    fen0, sans, ucis, clk, ph, ev:null, bm:null, pv:null, depth:0, imported:Date.now() };
+}
+
+/* ================= storage ================= */
+const IDB = {
+  db:null,
+  open(){ return new Promise((res,rej)=>{ const r=indexedDB.open('chesscoach',1); r.onupgradeneeded=()=>{ const d=r.result; for (const n of ['games','puzzles','meta']) if(!d.objectStoreNames.contains(n)) d.createObjectStore(n); }; r.onsuccess=()=>{ this.db=r.result; res(); }; r.onerror=()=>rej(r.error); }); },
+  all(store){ return new Promise((res,rej)=>{ const out={}; const t=this.db.transaction(store).objectStore(store).openCursor(); t.onsuccess=e=>{ const c=e.target.result; if(c){ out[c.key]=c.value; c.continue(); } else res(out); }; t.onerror=()=>rej(t.error); }); },
+  put(store,k,v){ return new Promise((res,rej)=>{ const t=this.db.transaction(store,'readwrite'); t.objectStore(store).put(v,k); t.oncomplete=res; t.onerror=()=>rej(t.error); }); },
+  del(store,k){ return new Promise((res,rej)=>{ const t=this.db.transaction(store,'readwrite'); t.objectStore(store).delete(k); t.oncomplete=res; t.onerror=()=>rej(t.error); }); },
+};
+const Store = {
+  mode:'local', ok:false, mem:{games:{}, puzzles:{}}, settings:{username:'', depth:12},
+  lsGet(k){ try { return JSON.parse(localStorage.getItem('cc_'+k)||'null'); } catch(e){ return null; } },
+  async initLocal(){
+    try {
+      await IDB.open(); this.ok=true;
+      this.mem.games = await IDB.all('games'); this.mem.puzzles = await IDB.all('puzzles');
+      const m = await IDB.all('meta'); if (m.settings) Object.assign(this.settings, m.settings);
+      try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch(e){}
+    } catch(e){
+      console.warn('idb', e);
+      this.mem.games = this.lsGet('games')||{}; this.mem.puzzles=this.lsGet('puzzles')||{}; Object.assign(this.settings, this.lsGet('settings')||{});
+    }
+  },
+  async init(){},
+  _ls(kind){ try { localStorage.setItem('cc_'+kind, JSON.stringify(this.mem[kind])); } catch(e){} },
+  save(kind, id, obj){ this.mem[kind][id]=obj; if (this.ok) IDB.put(kind, id, JSON.parse(JSON.stringify(obj))).catch(e=>{ console.warn(e); toast('تعذّر الحفظ — مساحة الجهاز ممتلئة؟'); }); else this._ls(kind); },
+  del(kind, id){ delete this.mem[kind][id]; if (this.ok) IDB.del(kind, id).catch(()=>{}); else this._ls(kind); },
+  saveSettings(){ const s=JSON.parse(JSON.stringify(this.settings)); if (this.ok) IDB.put('meta','settings',s).catch(()=>{}); else try{ localStorage.setItem('cc_settings', JSON.stringify(s)); }catch(e){} },
+};
+function updateSavePill(){ const p=$('#savePill'); p.textContent = navigator.onLine? '💾 على جهازك' : '✈ بدون إنترنت'; p.className='pill'; }
+window.addEventListener('online', updateSavePill); window.addEventListener('offline', updateSavePill);
+
+/* ================= engine ================= */
+const Engine = {
+  w:null, ready:null, chain:Promise.resolve(), handler:null, ok:false,
+  urls:['https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js','https://cdn.jsdelivr.net/npm/stockfish.js@10.0.2/stockfish.js'],
+  init(){
+    if (this.ready) return this.ready;
+    this.ready = (async () => {
+      try { await this._start(null); this.ok=true; setEng('ok'); return true; } catch(e){ console.warn('engine local', e); }
+      for (const u of this.urls){ try { await this._start(u); this.ok=true; setEng('ok'); return true; } catch(e){ console.warn('engine', u, e); } }
+      setEng('bad'); throw new Error('engine failed');
+    })();
+    return this.ready;
+  },
+  _start(url){
+    return new Promise((res, rej) => {
+      let w;
+      try {
+        if (!url) w = new Worker('lib/stockfish.js');
+        else { const src = `try{importScripts(${JSON.stringify(url)});}catch(e){postMessage('__fail__ '+e.message);}`; w = new Worker(URL.createObjectURL(new Blob([src],{type:'application/javascript'}))); }
+      } catch(e){ rej(e); return; }
+      const t = setTimeout(()=>{ w.terminate(); rej(new Error('timeout')); }, 45000);
+      w.onmessage = e => { const d=String(e.data);
+        if (d.startsWith('__fail__')){ clearTimeout(t); w.terminate(); rej(new Error(d)); return; }
+        if (d==='uciok'){ clearTimeout(t); this.w=w; w.onmessage = ev => this.handler && this.handler(String(ev.data)); w.postMessage('setoption name Hash value 32'); w.postMessage('isready'); res(); }
+      };
+      w.onerror = e => { clearTimeout(t); w.terminate(); rej(new Error('worker error')); };
+      w.postMessage('uci');
+    });
+  },
+  newGame(){ return this._job(() => new Promise(res => { this.handler = l => { if (l==='readyok'){ this.handler=null; res(); } }; this.w.postMessage('ucinewgame'); this.w.postMessage('isready'); })); },
+  analyze(fen, depth, movetime=3500){
+    return this._job(() => new Promise(res => {
+      const turn = fen.split(' ')[1]; let last={cp:0, pv:[], depth:0};
+      this.handler = line => {
+        if (line.startsWith('info') && line.includes(' pv ') && !line.includes('bound') && !/multipv [2-9]/.test(line)){
+          const d=line.match(/ depth (\d+)/), cp=line.match(/ score cp (-?\d+)/), mt=line.match(/ score mate (-?\d+)/), pv=line.split(' pv ')[1];
+          let v = cp ? +cp[1] : (mt ? (+mt[1]>0? MATE-(+mt[1]) : -MATE-(+mt[1])) : null);
+          if (mt && +mt[1]===0) v = -MATE;
+          if (v!=null){ last = {cp: turn==='w'? v : -v, pv: pv? pv.trim().split(/\s+/) : [], depth: d? +d[1]:0}; }
+        } else if (line.startsWith('bestmove')){
+          this.handler=null; const b=line.split(/\s+/)[1]; res({best: (b && b!=='(none)')? b : null, cp:last.cp, pv:last.pv, depth:last.depth});
+        }
+      };
+      this.w.postMessage('position fen '+fen);
+      this.w.postMessage(`go depth ${depth} movetime ${movetime}`);
+    }));
+  },
+  _job(fn){ const p = this.chain.then(() => this.init()).then(fn); this.chain = p.catch(()=>{}); return p; }
+};
+function setEng(s){ const p=$('#engPill'); if(s==='ok'){ p.textContent='⚙ المحرك جاهز'; p.className='pill ok'; } else if (s==='bad'){ p.textContent='⚠ تعذّر تحميل المحرك'; p.className='pill bad'; } }
+
+/* ================= analysis ================= */
+function fensOf(g){ const c=new Chess(g.fen0||START); const f=[c.fen()]; for (const u of g.ucis){ c.move({from:u.slice(0,2), to:u.slice(2,4), promotion:u[4]}); f.push(c.fen()); } return f; }
+function terminalEval(fen){ const c=new Chess(fen); if (c.in_checkmate()) return c.turn()==='w'? -MATE : MATE; if (c.in_draw()||c.in_stalemate()||c.insufficient_material()) return 0; return null; }
+function userName(){ return (Store.settings.username||'').trim().toLowerCase(); }
+let autoName = null;
+function computeAutoName(){ const cnt={}; for (const g of Object.values(Store.mem.games)){ for (const n of [g.white,g.black]){ const k=(n||'').toLowerCase(); cnt[k]=(cnt[k]||0)+1; } } let best=null,bc=1; for (const k in cnt) if (cnt[k]>bc){ best=k; bc=cnt[k]; } autoName = best; }
+function userColor(g){ const u=userName()||autoName; if (!u) return null; if ((g.white||'').toLowerCase()===u) return 'w'; if ((g.black||'').toLowerCase()===u) return 'b'; return null; }
+function userResult(g){ const col=userColor(g); if (!col) return 'U'; if (g.result==='1/2-1/2') return 'D'; if (g.result==='1-0') return col==='w'?'W':'L'; if (g.result==='0-1') return col==='b'?'W':'L'; return 'U'; }
+
+function classify(g){
+  if (!g.ev) return null;
+  const out=[]; const n=g.ucis.length;
+  for (let i=0;i<n;i++){
+    const color = colorAt(g,i); const a=g.ev[i], b=g.ev[i+1];
+    if (a==null || b==null){ out.push(null); continue; }
+    const wb=wpFor(a,color), wa=wpFor(b,color); const loss=Math.max(0, wb-wa);
+    let cls;
+    if (g.bm[i] && g.bm[i]===g.ucis[i]) cls='best';
+    else if (loss<=2) cls='excellent'; else if (loss<=5) cls='good'; else if (loss<=10) cls='inacc'; else if (loss<=20) cls='mistake'; else cls='blunder';
+    out.push({i, color, cls, loss, wb, wa, acc: moveAcc(loss), phase: g.ph[i]||'m'});
+  }
+  for (let i=1;i<n;i++){ const p=out[i-1], m=out[i]; if (p&&m && p.loss>=15 && m.loss>=10) m.miss=true; }
+  return out;
+}
+function colorAt(g,i){ const t=(g.fen0||START).split(' ')[1]; return (i%2===0) === (t==='w') ? 'w' : 'b'; }
+function gameSummary(g){
+  const cl = classify(g); if (!cl) return null;
+  const s={w:{acc:[],c:{}}, b:{acc:[],c:{}}};
+  for (const m of cl){ if(!m) continue; s[m.color].acc.push(m.acc); s[m.color].c[m.cls]=(s[m.color].c[m.cls]||0)+1; }
+  return {cl, accW: gameAccuracy(s.w.acc), accB: gameAccuracy(s.b.acc), cW:s.w.c, cB:s.b.c};
+}
+
+const AN = { running:false, stop:false };
+async function analyzeGames(keys){
+  if (AN.running){ toast('التحليل يعمل بالفعل'); return; }
+  keys = keys.filter(k=>Store.mem.games[k]);
+  if (!keys.length) return;
+  AN.running=true; AN.stop=false; $('#analyzeCard').style.display='block';
+  try { await Engine.init(); } catch(e){ toast('تعذّر تحميل محرك Stockfish. تأكد من الاتصال بالإنترنت ثم أعد فتح الصفحة.'); AN.running=false; $('#analyzeCard').style.display='none'; return; }
+  const depth = +Store.settings.depth||12;
+  let done=0;
+  for (const k of keys){
+    if (AN.stop) break;
+    const g = Store.mem.games[k]; const fens=fensOf(g); const n=fens.length;
+    $('#anTitle').textContent = `تحليل المباراة ${done+1} من ${keys.length}`;
+    const ev=new Array(n).fill(null), bm=new Array(n).fill(null), pv=new Array(n).fill('');
+    await Engine.newGame();
+    const t0=Date.now();
+    for (let i=0;i<n;i++){
+      if (AN.stop) break;
+      const te = terminalEval(fens[i]);
+      if (te!=null){ ev[i]=te; }
+      else { const r = await Engine.analyze(fens[i], depth); ev[i]=r.cp; bm[i]=r.best; pv[i]=r.pv.slice(0,6).join(' '); }
+      const fr=(i+1)/n; $('#anBar').style.width = (100*(done+fr)/keys.length)+'%';
+      const el=(Date.now()-t0)/1000, eta=Math.round(el/fr - el);
+      $('#anSub').textContent = `${g.white} ضد ${g.black} — الموقف ${i+1}/${n}` + (i>3? ` — متبقٍ تقريبًا ${eta} ث` : '');
+    }
+    if (AN.stop) break;
+    Object.assign(g, {ev, bm, pv, depth, analyzedAt:Date.now()});
+    Store.save('games', k, g);
+    makePuzzles(g);
+    done++;
+    renderGames(); renderHome(); renderTrainHome();
+  }
+  AN.running=false; $('#analyzeCard').style.display='none';
+  toast(AN.stop? 'تم إيقاف التحليل' : `اكتمل تحليل ${done} مباراة ✔`);
+  renderAll();
+}
+
+/* ================= puzzles ================= */
+const CAT = { tactic:'تكتيك فاتك', threat:'تهديد تجاهلته', positional:'خطأ في التقدير', conversion:'تضييع أفضلية' };
+const PHASE = { o:'الافتتاح', m:'وسط اللعب', e:'النهاية' };
+function uciToSans(fen, list){ const c=new Chess(fen); const out=[]; for (const u of list){ const m=c.move({from:u.slice(0,2),to:u.slice(2,4),promotion:u[4]}); if(!m) break; out.push(m.san); } return out; }
+function makePuzzles(g){
+  const col=userColor(g); if (!col) return 0;
+  const cl=classify(g); const fens=fensOf(g); let made=0;
+  for (const m of cl){
+    if (!m || m.color!==col || m.loss<10 || m.wb<12) continue;
+    const i=m.i, best=g.bm[i]; if (!best || best===g.ucis[i]) continue;
+    let line=(g.pv[i]||'').split(' ').filter(Boolean); if (line[0]!==best) line=[best];
+    const len = (m.loss>=20 && line.length>=3) ? 3 : 1;
+    const sol=line.slice(0,len); const solSan=uciToSans(fens[i], line.slice(0,5));
+    if (!solSan.length) continue;
+    const c=new Chess(fens[i]); const bmv=c.move({from:best.slice(0,2),to:best.slice(2,4),promotion:best[4]});
+    const ref=(g.pv[i+1]||'').split(' ').filter(Boolean).slice(0,4); const refSan=uciToSans(fens[i+1], ref);
+    let cat='positional';
+    const c2=new Chess(fens[i+1]); const r0 = ref[0] ? c2.move({from:ref[0].slice(0,2),to:ref[0].slice(2,4),promotion:ref[0][4]}) : null;
+    if (m.wb>=75 && m.wa<60) cat='conversion';
+    else if (bmv && (bmv.captured || /[+#]/.test(bmv.san)) && m.loss>=12) cat='tactic';
+    else if (r0 && (r0.captured || /[+#]/.test(r0.san))) cat='threat';
+    const id='p'+hash(g.key+':'+i); const old=Store.mem.puzzles[id];
+    const p = { id, gk:g.key, ply:i, fen:fens[i], color:col, sol, solSan, played:g.sans[i], refSan, wb:Math.round(m.wb), wa:Math.round(m.wa), loss:Math.round(m.loss),
+      cls:m.cls, phase:m.phase, cat, opp: col==='w'? g.black : g.white, date:g.date,
+      box: old? old.box : 0, due: old? old.due : Date.now(), tries: old? old.tries:0, ok: old? old.ok:0, created: old? old.created: Date.now() };
+    Store.save('puzzles', id, p); made++;
+  }
+  return made;
+}
+const INTERVALS = [0.25, 1, 3, 7, 16, 35]; // days
+function duePuzzles(){ const now=Date.now(); return Object.values(Store.mem.puzzles).filter(p=>p.due<=now).sort((a,b)=>a.box-b.box || a.due-b.due); }
+
+/* ================= stats ================= */
+function computeStats(){
+  const games = Object.values(Store.mem.games);
+  const S = { total:games.length, analyzed:0, res:{W:0,L:0,D:0,U:0}, acc:[], trend:[], cls:{}, userMoves:0,
+    phase:{o:{n:0,err:0,acc:[]}, m:{n:0,err:0,acc:[]}, e:{n:0,err:0,acc:[]}},
+    color:{w:{g:0,pts:0,acc:[]}, b:{g:0,pts:0,acc:[]}},
+    time:{low:{n:0,err:0}, norm:{n:0,err:0}, fast:{n:0,err:0}, slowSpent:[], blunderSpent:[], hasClk:false},
+    missed:0, missedChances:0, thrown:0, saved:0, openings:{}, unknownColor:0 };
+  for (const g of games){
+    const col=userColor(g); if (!col){ S.unknownColor++; continue; }
+    const r=userResult(g); S.res[r]++;
+    const fam=g.family||'غير معروف'; const o = S.openings[fam] || (S.openings[fam]={n:0,pts:0,acc:[],w:0,b:0});
+    o.n++; o.pts += r==='W'?1:r==='D'?.5:0; o[col]++;
+    S.color[col].g++; S.color[col].pts += r==='W'?1:r==='D'?.5:0;
+    const cl=classify(g); if (!cl) continue;
+    S.analyzed++;
+    const mine=cl.filter(m=>m && m.color===col);
+    const ga=gameAccuracy(mine.map(m=>m.acc)); if (ga!=null){ S.acc.push(ga); S.trend.push({d:g.date, a:ga}); S.color[col].acc.push(ga); }
+    const opAcc = mine.filter(m=>m.phase==='o').map(m=>m.acc); if (opAcc.length) o.acc.push(avg(opAcc));
+    let maxWp=0, minWp=100;
+    for (const m of mine){
+      S.userMoves++; S.cls[m.cls]=(S.cls[m.cls]||0)+1;
+      const err = m.cls==='mistake'||m.cls==='blunder';
+      const P=S.phase[m.phase]; P.n++; P.acc.push(m.acc); if (err) P.err++;
+      if (m.miss) S.missedChances++;
+      maxWp=Math.max(maxWp,m.wa); minWp=Math.min(minWp,m.wa);
+      const ck=g.clk[m.i];
+      if (ck!=null && g.base>0){
+        S.time.hasClk=true;
+        const lowT = ck < Math.max(20, g.base*0.12);
+        const T = lowT? S.time.low : S.time.norm; T.n++; if (err) T.err++;
+        const prev = m.i>=2 ? g.clk[m.i-2] : null;
+        if (prev!=null && g.base<86400){
+          const spent = prev - ck + g.inc;
+          if (spent>=0){ if (spent<2.5 && !lowT && m.phase!=='o'){ S.time.fast.n++; if (err) S.time.fast.err++; }
+            if (m.cls==='blunder') S.time.blunderSpent.push(spent); else S.time.slowSpent.push(spent); }
+        }
+      }
+    }
+    if (maxWp>=85 && r!=='W') S.thrown++;
+    if (minWp<=15 && r!=='L') S.saved++;
+  }
+  S.trend.sort((a,b)=>a.d<b.d?-1:1);
+  return S;
+}
+function weaknesses(S){
+  const W=[]; if (S.analyzed<1) return W;
+  const per = x => (x/S.analyzed);
+  const bl=S.cls.blunder||0, mi=S.cls.mistake||0;
+  if (per(bl)>=1) W.push({sev: per(bl)*2.2, ic:'💥', col:'#4a2224', t:`${per(bl).toFixed(1)} خطأ فادح في كل مباراة`, d:'أغلب خسائرك في هذا المستوى تأتي من قطع متروكة أو تهديدات لم تنتبه لها. قبل كل نقلة اسأل نفسك: ماذا يهدد خصمي؟ وهل قطعي محمية؟', act:{label:'تمارين التهديدات', f:{cat:'threat'}}});
+  const ph=['o','m','e'].map(k=>({k, ...S.phase[k], rate: S.phase[k].n? S.phase[k].err/S.phase[k].n : 0})).filter(x=>x.n>=15);
+  if (ph.length>=2){ const worst=ph.sort((a,b)=>b.rate-a.rate)[0]; const others=ph.filter(x=>x!==worst); const oavg=avg(others.map(x=>x.rate));
+    if (worst.rate>oavg*1.3 && worst.rate>0.04){ const tips={o:'تعلّم مبادئ الافتتاح: سيطر على المركز، طوّر القطع قبل الهجوم، بيّت ملكك مبكرًا، ولا تحرك القطعة نفسها مرتين بلا سبب.', m:'في وسط اللعب ابحث أولًا عن الكش والأكل والتهديدات (لك ولخصمك) قبل التفكير بالخطة.', e:'النهايات تحسم كثيرًا من مباريات الرابيد. نشّط ملكك في النهاية، وتعلّم نهايات البيادق والقلاع الأساسية.'};
+      W.push({sev: worst.rate*40, ic:'🎯', col:'#3b3320', t:`أخطاؤك أكثر في ${PHASE[worst.k]} (${(worst.rate*100).toFixed(0)}٪ من نقلاتك)`, d:tips[worst.k], act:{label:'تمارين '+PHASE[worst.k], f:{phase:worst.k}}}); } }
+  if (S.missedChances/S.analyzed>=0.5) W.push({sev:S.missedChances/S.analyzed*2, ic:'🎁', col:'#203a2c', t:`تفوّت هدايا خصمك (${S.missedChances} فرصة ضائعة)`, d:'خصمك أخطأ ولم تعاقبه. بعد كل نقلة للخصم اسأل: هل ترك شيئًا بلا حماية؟ هل يوجد كش أو أكل مفيد؟', act:{label:'تمارين التكتيك', f:{cat:'tactic'}}});
+  if (S.thrown>=1 && S.thrown/S.analyzed>=0.12) W.push({sev:S.thrown/S.analyzed*8, ic:'🏳', col:'#2b2540', t:`ضيّعت ${S.thrown} مباراة كنت فيها فائزًا`, d:'عندما تكون متقدمًا: بسّط اللعب، بادل القطع، وانتبه للدفاع قبل الهجوم. لا تستعجل.', act:{label:'تمارين تضييع الأفضلية', f:{cat:'conversion'}}});
+  const T=S.time;
+  if (T.hasClk && T.low.n>=8){ const lr=T.low.err/T.low.n, nr=T.norm.n? T.norm.err/T.norm.n:0; if (lr>nr*1.5 && lr>0.08) W.push({sev:lr*25, ic:'⏱', col:'#1f2d40', t:'تنهار تحت ضغط الوقت', d:`نسبة أخطائك حين يقل وقتك ${(lr*100).toFixed(0)}٪ مقابل ${(nr*100).toFixed(0)}٪ في الوضع العادي. وزّع وقتك: لا تصرف دقائق في الافتتاح، واحتفظ بوقت للنهاية.`}); }
+  if (T.hasClk && T.fast.n>=10){ const fr=T.fast.err/T.fast.n, nr=T.norm.n? T.norm.err/T.norm.n:0; if (fr>nr*1.4 && fr>0.07) W.push({sev:fr*22, ic:'⚡', col:'#40301f', t:'تلعب بعض النقلات بسرعة زائدة', d:`النقلات التي تلعبها في أقل من ثانيتين ونصف (خارج الافتتاح) نسبة الخطأ فيها ${(fr*100).toFixed(0)}٪. في الرابيد عندك وقت كافٍ: خذ ٥ ثوانٍ لتفحص التهديدات قبل أن تحرك.`}); }
+  const cw=S.color.w, cb=S.color.b; if (cw.g>=5 && cb.g>=5){ const sw=cw.pts/cw.g, sb=cb.pts/cb.g; if (Math.abs(sw-sb)>=0.15){ const weak= sw<sb? 'w':'b'; W.push({sev:Math.abs(sw-sb)*6, ic:weak==='w'?'⚪':'⚫', col:'#2a2f36', t:`نتائجك أضعف بال${weak==='w'?'أبيض':'أسود'} (${Math.round((weak==='w'?sw:sb)*100)}٪ من النقاط)`, d:'راجع افتتاحاتك بهذا اللون في جدول الافتتاحات وجهّز افتتاحًا واحدًا بسيطًا تفهم أفكاره.'}); } }
+  const ops=Object.entries(S.openings).filter(([k,o])=>o.n>=4).map(([k,o])=>({k,...o,sc:o.pts/o.n})).sort((a,b)=>a.sc-b.sc);
+  if (ops.length && ops[0].sc<0.4) W.push({sev:(0.5-ops[0].sc)*5, ic:'📖', col:'#2a3320', t:`افتتاح يتعبك: ${ops[0].k}`, d:`لعبته ${ops[0].n} مرات وحصلت على ${Math.round(ops[0].sc*100)}٪ فقط من النقاط. افتح إحدى هذه المباريات وراجع أول ١٠ نقلات مع المحرك.`});
+  return W.sort((a,b)=>b.sev-a.sev);
+}
+
+/* ================= AI coach ================= */
+let AI = null;
+async function initAI(){ try { if (window.claude && claude.use) AI = await withTimeout(claude.use('sample'), 11000); } catch(e){ AI=null; } renderAll(); }
+async function askAI(prompt, el, btn){
+  if (!AI){ el.classList.add('on'); el.textContent='المدرّب الذكي غير متاح في هذا العرض.'; return; }
+  el.classList.add('on'); el.textContent='يفكّر المدرّب…'; if (btn) btn.disabled=true;
+  try {
+    const r = await AI(prompt, { modelTier:'default', onText:({text})=>{ el.textContent=text; } });
+    el.textContent = r.text || el.textContent;
+  } catch(e){
+    el.textContent = e && e.code==='rate_limited' ? 'طلبات كثيرة، انتظر قليلًا ثم حاول.' : (e && e.code==='not_granted' ? 'لم يتم السماح للمدرّب الذكي.' : 'تعذّر الحصول على شرح الآن.');
+  } finally { if (btn) btn.disabled=false; }
+}
+const AI_RULES = 'أنت مدرب شطرنج ودود لاعب مستواه نحو 1000 في الرابيد. اكتب بالعربية الفصحى المبسطة، بدون جداول أو عناوين، في 4 إلى 6 جمل قصيرة. اعتمد فقط على خطوط المحرك المعطاة ولا تخترع نقلات أخرى. اكتب النقلات بالترميز الإنجليزي (مثل Nf3).';
+function moveContextPrompt(o){
+  return `${AI_RULES}
+الموقف (FEN): ${o.fen}
+أنا ألعب بـ${o.color==='w'?'الأبيض':'الأسود'}. مرحلة المباراة: ${PHASE[o.phase]||''}.
+النقلة التي لعبتها: ${o.played}. احتمال فوزي قبلها ${o.wb}٪ وبعدها ${o.wa}٪.
+أفضل نقلة حسب المحرك: ${o.best} وخطها: ${o.bestLine}.
+رد الخصم الأقوى على نقلتي: ${o.refute||'غير متوفر'}.
+اشرح: لماذا نقلتي ضعيفة (ما الذي سمحت به أو فوّتّه)، وما فكرة أفضل نقلة، ثم أعطني قاعدة عملية واحدة أتذكرها في مبارياتي القادمة.`;
+}
+
+/* ================= views ================= */
+let curTab='home';
+function showTab(t){ curTab=t; $$('.view').forEach(v=>v.classList.remove('on')); $('#v-'+t).classList.add('on'); $$('nav.tabs button').forEach(b=>b.classList.toggle('on', b.dataset.tab===t)); window.scrollTo(0,0);
+  if (t==='home') renderHome(); if (t==='games') renderGames(); if (t==='train') renderTrainHome(); if (t==='settings') renderSettings(); }
+$$('nav.tabs button').forEach(b=>b.onclick=()=>{ if (curTab==='train' && PZ.active) endSession(); showTab(b.dataset.tab); });
+
+function renderAll(){ computeAutoName(); renderHome(); renderGames(); renderTrainHome(); updateBadge(); }
+function updateBadge(){ const n=duePuzzles().length; const b=$('#dueBadge'); b.style.display=n?'block':'none'; b.textContent=n>99?'99+':n; }
+
+function bar(v, color){ return `<div class="bar"><i style="width:${Math.max(2,Math.min(100,v))}%;background:${color}"></i></div>`; }
+function accColor(a){ return a>=85?'var(--good)':a>=75?'var(--exc)':a>=65?'var(--inacc)':a>=55?'var(--mist)':'var(--blun)'; }
+
+function renderHome(){
+  const el=$('#v-home'); const S=computeStats();
+  if (!S.total){
+    el.innerHTML = `<div class="card empty"><div class="big">♞</div><h2>أهلًا! خلّنا نكسر حاجز الألف</h2>
+      <p class="muted">ارفع مبارياتك من تشز دوت كوم، وسيحللها Stockfish على جهازك مجانًا، ثم يحوّل <b>أخطاءك أنت</b> إلى تمارين تتكرر عليك حتى تتقنها، ويكشف نقاط ضعفك الحقيقية.</p>
+      <button class="btn primary" onclick="showTab('games')">ابدأ باستيراد مبارياتك</button></div>
+      <div class="card"><h2>ليش هذا أفضل من التمارين العامة؟</h2><p class="small muted" style="margin:0">التمارين العشوائية تعلّمك أنماطًا قد لا تواجهها. هنا كل تمرين هو موقف حقيقي أخطأت فيه، وتتكرر المواقف التي تخطئ فيها أكثر (نظام التكرار المتباعد) — فتصلّح عاداتك أنت بالذات.</p></div>`;
+    return;
+  }
+  const unAn = Object.values(Store.mem.games).filter(g=>!g.ev).length;
+  const winRate = pct(S.res.W + S.res.D/2, S.res.W+S.res.L+S.res.D);
+  const A = avg(S.acc);
+  const W = weaknesses(S);
+  const due = duePuzzles().length;
+  let h='';
+  if (!userName() && !autoName) h+=`<div class="card fb info small">اكتب اسم حسابك في <a href="#" onclick="showTab('settings');return false" style="color:var(--accent)">الإعدادات</a> حتى أعرف أي لون كنت تلعب.</div>`;
+  else if (!userName() && autoName) h+=`<div class="card small muted">تعرّفت عليك تلقائيًا كـ <b class="ltr">${esc(autoName)}</b>. غيّره من الإعدادات إن كان خطأ.</div>`;
+  if (unAn) h+=`<div class="card row"><div class="grow"><b>${unAn} مباراة لم تُحلَّل بعد</b><div class="small muted">التحليل يجري على جهازك؛ اترك الصفحة مفتوحة.</div></div><button class="btn primary" id="homeAnalyze">حلّل الآن</button></div>`;
+  h+=`<div class="card"><div class="kpis">
+    <div class="kpi"><b>${S.analyzed? A.toFixed(1)+'%' : '–'}</b><span>متوسط دقّتك</span></div>
+    <div class="kpi"><b>${winRate}%</b><span>نسبة النقاط (${S.res.W} فوز / ${S.res.L} خسارة / ${S.res.D} تعادل)</span></div>
+    <div class="kpi"><b>${S.analyzed? ((S.cls.blunder||0)/S.analyzed).toFixed(1) : '–'}</b><span>أخطاء فادحة لكل مباراة</span></div>
+    <div class="kpi"><b>${due}</b><span>تمارين مستحقة اليوم</span></div></div>
+    ${due? `<button class="btn primary block" style="margin-top:10px" onclick="showTab('train');startSession({})">ابدأ تمارين اليوم (${due})</button>`:''}</div>`;
+  if (S.trend.length>=3) h+=`<div class="card"><h2>تطور دقتك</h2>${sparkline(S.trend.slice(-30).map(x=>x.a))}<div class="small muted">آخر ${Math.min(30,S.trend.length)} مباراة محللة</div></div>`;
+  if (W.length){
+    h+=`<div class="card"><h2>أهم ما يوقف تقدمك</h2>${W.slice(0,4).map((w,k)=>`<div class="weak"><div class="ic" style="background:${w.col}">${w.ic}</div><div class="grow"><b>${esc(w.t)}</b><div class="small muted">${esc(w.d)}</div>${w.act? `<button class="btn ghost" style="margin-top:6px;padding:6px 10px;font-size:13px" data-wk="${k}">${esc(w.act.label)} ←</button>`:''}</div></div>`).join('')}
+    <button class="btn block" id="coachBtn" style="margin-top:10px;${AI?'':'display:none'}">🤖 تقرير المدرّب الذكي وخطة أسبوعية</button><div class="ai" id="coachAI"></div></div>`;
+  } else if (S.analyzed) h+=`<div class="card"><h2>نقاط ضعفك</h2><p class="muted small" style="margin:0">حلّل مباريات أكثر (يفضّل ١٠ أو أكثر) لتظهر أنماط واضحة.</p></div>`;
+  if (S.analyzed){
+    const P=S.phase, pr=k=>P[k].n? avg(P[k].acc):0;
+    h+=`<div class="card"><h2>دقتك حسب مرحلة المباراة</h2>${['o','m','e'].map(k=>`<div class="statrow"><span>${PHASE[k]}</span>${bar(pr(k),accColor(pr(k)))}<span class="v">${P[k].n? pr(k).toFixed(0)+'%':'–'}</span></div>`).join('')}
+      <div class="small muted">نسبة الأخطاء والأخطاء الفادحة: ${['o','m','e'].map(k=>`${PHASE[k]} ${P[k].n? (100*P[k].err/P[k].n).toFixed(0)+'٪':'–'}`).join(' • ')}</div></div>`;
+    const c=S.cls, tot=S.userMoves||1; const rows=[['best','أفضل نقلة','var(--good)'],['excellent','ممتازة','var(--exc)'],['good','جيدة','var(--ok)'],['inacc','غير دقيقة','var(--inacc)'],['mistake','خطأ','var(--mist)'],['blunder','خطأ فادح','var(--blun)']];
+    h+=`<div class="card"><h2>توزيع نقلاتك</h2>${rows.map(([k,l,col])=>`<div class="statrow"><span>${l}</span>${bar(100*(c[k]||0)/tot,col)}<span class="v">${c[k]||0}</span></div>`).join('')}</div>`;
+    const T=S.time; if (T.hasClk){ const r=x=>x.n? (100*x.err/x.n).toFixed(0)+'٪':'–';
+      h+=`<div class="card"><h2>إدارة الوقت</h2>
+      <div class="statrow"><span>وقت مريح</span>${bar(T.norm.n?100*T.norm.err/T.norm.n*3:0,'var(--inacc)')}<span class="v">${r(T.norm)}</span></div>
+      <div class="statrow"><span>وقت ضيق</span>${bar(T.low.n?100*T.low.err/T.low.n*3:0,'var(--blun)')}<span class="v">${r(T.low)}</span></div>
+      <div class="statrow"><span>نقلات متسرعة</span>${bar(T.fast.n?100*T.fast.err/T.fast.n*3:0,'var(--mist)')}<span class="v">${r(T.fast)}</span></div>
+      <div class="small muted">نسبة الأخطاء في كل حالة. متوسط وقتك على الأخطاء الفادحة: ${T.blunderSpent.length? avg(T.blunderSpent).toFixed(1)+' ث' : '–'} مقابل ${T.slowSpent.length? avg(T.slowSpent).toFixed(1)+' ث':'–'} لبقية النقلات.</div></div>`; }
+    h+=`<div class="card"><h2>مؤشرات المباريات</h2><div class="kpis">
+      <div class="kpi"><b>${S.thrown}</b><span>مباريات كنت فائزًا فيها ولم تفز</span></div>
+      <div class="kpi"><b>${S.saved}</b><span>مباريات كنت خاسرًا فيها وأنقذتها</span></div>
+      <div class="kpi"><b>${S.missedChances}</b><span>فرص ضائعة بعد خطأ الخصم</span></div>
+      <div class="kpi"><b>${S.color.w.acc.length? avg(S.color.w.acc).toFixed(0):'–'} / ${S.color.b.acc.length? avg(S.color.b.acc).toFixed(0):'–'}</b><span>دقتك بالأبيض / بالأسود</span></div></div></div>`;
+  }
+  const ops=Object.entries(S.openings).sort((a,b)=>b[1].n-a[1].n).slice(0,8);
+  if (ops.length) h+=`<div class="card"><h2>افتتاحاتك</h2><table class="t"><tr><th>الافتتاح</th><th>مباريات</th><th>النقاط</th><th>دقة الافتتاح</th></tr>${ops.map(([k,o])=>`<tr><td style="direction:ltr;text-align:right">${esc(k)}</td><td>${o.n}</td><td style="color:${o.pts/o.n>=.5?'var(--good)':'var(--blun)'}">${Math.round(100*o.pts/o.n)}%</td><td>${o.acc.length? avg(o.acc).toFixed(0)+'%':'–'}</td></tr>`).join('')}</table></div>`;
+  el.innerHTML=h;
+  const ha=$('#homeAnalyze'); if (ha) ha.onclick=()=>{ showTab('games'); analyzeGames(Object.values(Store.mem.games).filter(g=>!g.ev).sort(byDate).map(g=>g.key)); };
+  el.querySelectorAll('[data-wk]').forEach(b=>b.onclick=()=>{ const w=W[+b.dataset.wk]; showTab('train'); setFilter(w.act.f); });
+  const cb=$('#coachBtn'); if (cb) cb.onclick=()=>{
+    const summary = { مباريات_محللة:S.analyzed, متوسط_الدقة:+A.toFixed(1), نتائج:S.res, أخطاء_فادحة_لكل_مباراة:+((S.cls.blunder||0)/S.analyzed).toFixed(2), أخطاء_لكل_مباراة:+((S.cls.mistake||0)/S.analyzed).toFixed(2),
+      نسبة_الخطأ_حسب_المرحلة:Object.fromEntries(['o','m','e'].map(k=>[PHASE[k], S.phase[k].n? +(S.phase[k].err/S.phase[k].n).toFixed(3):null])),
+      الوقت:{خطأ_وقت_ضيق:S.time.low.n? +(S.time.low.err/S.time.low.n).toFixed(3):null, خطأ_وقت_مريح:S.time.norm.n? +(S.time.norm.err/S.time.norm.n).toFixed(3):null, خطأ_نقلات_متسرعة:S.time.fast.n? +(S.time.fast.err/S.time.fast.n).toFixed(3):null},
+      مباريات_فائزة_ضاعت:S.thrown, فرص_ضائعة:S.missedChances, الافتتاحات:Object.fromEntries(ops.map(([k,o])=>[k,{مباريات:o.n, نسبة_النقاط:Math.round(100*o.pts/o.n)}])),
+      ملاحظات_آلية:W.map(w=>w.t) };
+    askAI(`أنت مدرب شطرنج محترف ودود. لاعب تقييمه نحو 1000 في الرابيد على تشز دوت كوم توقف تطوره. هذه إحصاءات محسوبة من تحليل مبارياته بمحرك Stockfish:
+${JSON.stringify(summary)}
+اكتب بالعربية المبسطة تقريرًا قصيرًا: (1) تشخيص في جملتين لأهم سببين يمنعانه من التقدم، مستندًا للأرقام. (2) خطة لـ7 أيام، كل يوم سطر واحد عملي (مثال: 20 دقيقة تمارين أخطائي في التطبيق + مباراتان رابيد 15+10 مع التركيز على ...). (3) عادة تفكير واحدة يطبقها قبل كل نقلة. لا تستخدم جداول. لا تتجاوز 180 كلمة.`, $('#coachAI'), cb);
+  };
+}
+function sparkline(vals){
+  const W=300,H=60,n=vals.length; const mn=Math.min(...vals)-3, mx=Math.max(...vals)+3; const x=i=>n<2?W/2: i*(W-8)/(n-1)+4, y=v=>H-4-(v-mn)/(mx-mn||1)*(H-8);
+  const pts=vals.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const ma=vals.map((v,i)=>avg(vals.slice(Math.max(0,i-4),i+1)));
+  const mpts=ma.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="#5a6676" stroke-width="1.5"/><polyline points="${mpts}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/></svg><div class="small muted">الخط الذهبي: المتوسط المتحرك لآخر ٥ مباريات</div>`;
+}
+
+const byDate = (a,b)=> (b.date||'') < (a.date||'') ? -1 : 1;
+function renderGames(){
+  const list = Object.values(Store.mem.games).sort(byDate);
+  const el=$('#gameList');
+  if (!list.length){ el.innerHTML='<div class="muted small empty">لا توجد مباريات بعد. استورد من الأعلى.</div>'; return; }
+  el.innerHTML = list.slice(0,300).map(g=>{
+    const col=userColor(g), r=userResult(g), opp = col==='w'? g.black : col==='b'? g.white : `${g.white} – ${g.black}`;
+    const oppElo = col==='w'? g.belo : col==='b'? g.welo : '';
+    const sm = gameSummary(g); const acc = sm? (col==='b'? sm.accB : sm.accW) : null;
+    const cnt = sm? (col==='b'? sm.cB : sm.cW) : null;
+    return `<div class="game" data-k="${g.key}"><div class="res ${r}">${{W:'✓',L:'✗',D:'½',U:'—'}[r]}</div>
+      <div class="who"><b>${col? (col==='w'?'⚪ ':'⚫ ')+'ضد ':''}<span class="ltr">${esc(opp)}</span> ${oppElo? `<span class="muted small">(${esc(oppElo)})</span>`:''}</b>
+      <span class="small muted">${esc((g.date||'').split(' ')[0])} • ${esc(g.family||'')} ${cnt? `• <span style="color:var(--blun)">${cnt.blunder||0}??</span> <span style="color:var(--mist)">${cnt.mistake||0}?</span>`:''}</span></div>
+      ${sm? `<span class="acc" style="color:${accColor(acc||0)}">${acc!=null? acc.toFixed(0)+'%':''}</span>` : `<button class="btn ghost" style="padding:6px 10px;font-size:13px" data-an="${g.key}">حلّل</button>`}</div>`;
+  }).join('') + (list.length>300? `<div class="small muted">يُعرض أحدث 300 مباراة.</div>`:'');
+  el.querySelectorAll('.game').forEach(d=>d.onclick=e=>{ const an=e.target.closest('[data-an]'); if (an){ e.stopPropagation(); analyzeGames([an.dataset.an]); return; } openReview(d.dataset.k); });
+}
+$('#analyzeAll').onclick=()=>{ const ks=Object.values(Store.mem.games).filter(g=>!g.ev || g.depth<(+Store.settings.depth||12)-2).sort(byDate).map(g=>g.key); if(!ks.length){ toast('كل المباريات محللة ✔'); return; } analyzeGames(ks); };
+$('#anStop').onclick=()=>{ AN.stop=true; };
+
+function doImport(text){
+  const parts=splitPgn(text); let added=0, dup=0, bad=0; const newKeys=[];
+  for (const p of parts){ let g=null; try { g=parseGame(p); } catch(e){ console.warn(e); } if (!g){ bad++; continue; } if (Store.mem.games[g.key]){ dup++; continue; } Store.save('games', g.key, g); added++; newKeys.push(g.key); }
+  computeAutoName(); renderAll();
+  toast(`أُضيفت ${added} مباراة` + (dup? ` • ${dup} مكررة`:'') + (bad? ` • ${bad} تعذّر قراءتها`:''));
+  return newKeys;
+}
+$('#importBtn').onclick=()=>{ const t=$('#pgnIn').value.trim(); if(!t){ toast('الصق PGN أولًا'); return; } const ks=doImport(t); if (ks.length){ $('#pgnIn').value=''; } };
+$('#pgnFile').onchange=async e=>{ let all=''; for (const f of e.target.files) all += '\n\n' + await f.text(); e.target.value=''; doImport(all); };
+
+/* ---------- review ---------- */
+const RV = { g:null, fens:[], cl:null, ply:0, flip:false, board:null };
+const CLS_META = { best:['★','أفضل نقلة'], excellent:['!','ممتازة'], good:['✓','جيدة'], inacc:['?!','غير دقيقة'], mistake:['?','خطأ'], blunder:['??','خطأ فادح'] };
+function openReview(key, ply){
+  const g=Store.mem.games[key]; if (!g) return;
+  RV.g=g; RV.fens=fensOf(g); RV.cl=classify(g); RV.flip = userColor(g)==='b';
+  if (!RV.board) RV.board = new BoardView($('#revBoard'));
+  showTab('review');
+  $('#revTitle').innerHTML = `<span class="ltr">${esc(g.white)} ${g.welo?'('+esc(g.welo)+')':''} – ${esc(g.black)} ${g.belo?'('+esc(g.belo)+')':''}</span> • ${esc(g.result)} • ${esc(g.opening||'')}`;
+  const sm=gameSummary(g);
+  const f1=v=>v==null?'–':v.toFixed(1)+'%';
+  $('#revAcc').innerHTML = sm? `الدقة: أبيض <b class="ltr">${f1(sm.accW)}</b> • أسود <b class="ltr">${f1(sm.accB)}</b>` : 'لم تُحلل هذه المباراة بعد';
+  const uc=userColor(g)||'w'; const cc = sm? (uc==='w'? sm.cW: sm.cB):null;
+  $('#revCounts').innerHTML = cc? `<span style="color:var(--blun)">${cc.blunder||0}??</span> <span style="color:var(--mist)">${cc.mistake||0}?</span> <span style="color:var(--inacc)">${cc.inacc||0}?!</span>`:'';
+  renderMoveList(); drawGraph();
+  let start = ply!=null? ply : 0;
+  if (ply==null && RV.cl){ const col=userColor(g); const f=RV.cl.find(m=>m && (!col||m.color===col) && (m.cls==='blunder'||m.cls==='mistake')); if (f) start=f.i+1; }
+  goPly(start);
+}
+function renderMoveList(){
+  const g=RV.g; let h=''; const off = colorAt(g,0)==='b' ? 1 : 0;
+  const cells=[]; if (off) cells.push(null);
+  g.sans.forEach((s,i)=>cells.push(i));
+  for (let r=0;r<cells.length;r+=2){
+    h+=`<div class="n">${r/2+1}.</div>`;
+    for (const i of [cells[r], cells[r+1]]){
+      if (i==null){ h+='<div></div>'; continue; }
+      const m=RV.cl && RV.cl[i]; const showB = m && ['inacc','mistake','blunder'].includes(m.cls);
+      h+=`<div class="m" data-p="${i+1}"><span>${esc(g.sans[i])}</span>${m && showB? `<span class="cls c-${m.cls}">${CLS_META[m.cls][0]}</span>`:''}</div>`;
+    }
+  }
+  const el=$('#revMoves'); el.innerHTML=h; el.querySelectorAll('.m').forEach(d=>d.onclick=()=>goPly(+d.dataset.p));
+}
+function drawGraph(){
+  const g=RV.g, svg=$('#revGraph'); if (!g.ev){ svg.innerHTML='<text x="150" y="44" text-anchor="middle" fill="#9aa6b4" font-size="11">حلّل المباراة لرؤية منحنى التقييم</text>'; return; }
+  const n=g.ev.length; const x=i=>n<2?0:i*300/(n-1), y=v=>80-wp(v)*0.8;
+  let d=`M0,80 `+g.ev.map((v,i)=>`L${x(i).toFixed(2)},${y(v??0).toFixed(2)}`).join(' ')+` L300,80 Z`;
+  let marks=''; if (RV.cl) RV.cl.forEach(m=>{ if (m && (m.cls==='blunder'||m.cls==='mistake')) marks+=`<circle cx="${x(m.i+1)}" cy="${y(g.ev[m.i+1])}" r="2.6" fill="${m.cls==='blunder'?'#e3524b':'#ec8b3a'}"/>`; });
+  svg.innerHTML = `<rect width="300" height="80" fill="#3a3f46"/><path d="${d}" fill="#eef0f2"/><line x1="0" y1="40" x2="300" y2="40" stroke="#888" stroke-width=".4" stroke-dasharray="2 2"/>${marks}<line id="gCur" x1="0" y1="0" x2="0" y2="80" stroke="var(--accent)" stroke-width="1.4"/>`;
+  svg.onclick = e => { const r=svg.getBoundingClientRect(); let fx=(e.clientX-r.left)/r.width; goPly(Math.round(fx*(n-1))); };
+}
+function goPly(p){
+  const g=RV.g; p=Math.max(0,Math.min(g.sans.length,p)); RV.ply=p;
+  const fen=RV.fens[p]; const lastU = p>0? g.ucis[p-1] : null;
+  const m = p>0 && RV.cl ? RV.cl[p-1] : null;
+  const arrows=[]; const marks={};
+  if (m && g.bm[p-1] && m.cls!=='best' && m.loss>2){ const b=g.bm[p-1]; arrows.push({from:b.slice(0,2), to:b.slice(2,4), c:'g'}); }
+  if (lastU && m && (m.cls==='blunder'||m.cls==='mistake')) marks[lastU.slice(2,4)]='bad';
+  RV.board.set(fen, {flip:RV.flip, last: lastU? {from:lastU.slice(0,2), to:lastU.slice(2,4)}:null, arrows, marks});
+  // eval bar
+  const ev = g.ev? g.ev[p] : null; const eb=$('#revEval');
+  const w = ev==null? 50 : wp(ev); eb.querySelector('.w').style.height = w+'%';
+  eb.style.transform = RV.flip? 'rotate(180deg)':'none';
+  const t=eb.querySelector('.t'); const neg = ev!=null && ev<0;
+  t.textContent = ev==null? '' : fmtEval(ev).replace(/^[+-]/,''); t.style.transform=RV.flip?'rotate(180deg)':'none';
+  t.style.top = neg? '3px':'auto'; t.style.bottom = neg? 'auto':'3px'; t.style.color = neg? '#fff':'#222';
+  // info
+  let info='';
+  if (p===0) info = '<span class="muted">بداية المباراة. استخدم الأسهم أو اضغط على نقلة أو على المنحنى.</span>';
+  else {
+    const moveNo = Math.floor((p-1 + (colorAt(g,0)==='b'?1:0))/2)+1; const isB = colorAt(g,p-1)==='b';
+    info = `<div class="row"><span class="san">${moveNo}${isB?'...':'.'} ${esc(g.sans[p-1])}</span>`;
+    if (m) info += ` <span class="cls c-${m.cls}">${CLS_META[m.cls][0]}</span> <b>${CLS_META[m.cls][1]}</b>${m.miss? ' <span class="tag hot">فرصة ضائعة</span>':''}`;
+    info += `<span class="grow"></span><span class="small muted ltr">${ev!=null? fmtEval(ev):''}</span></div>`;
+    if (m && g.bm[p-1] && m.cls!=='best'){
+      const bl = uciToSans(RV.fens[p-1], (g.pv[p-1]||g.bm[p-1]).split(' ').slice(0,5));
+      info += `<div class="small" style="margin-top:4px">الأفضل: <b class="ltr">${esc(bl[0]||'')}</b> <span class="muted ltr">${esc(bl.slice(1).join(' '))}</span>${m.loss>=1? ` • خسرت ${m.loss.toFixed(0)}٪ من فرص الفوز`:''}</div>`;
+      if (m.loss>=10){
+        const refute = uciToSans(fen, (g.pv[p]||'').split(' ').filter(Boolean).slice(0,4));
+        if (refute.length) info += `<div class="small muted">رد الخصم الأقوى: <span class="ltr">${esc(refute.join(' '))}</span></div>`;
+        if (AI) info += `<button class="btn ghost" id="revExplain" style="margin-top:8px;padding:7px 10px;font-size:13px">🤖 اشرح لي هذا الخطأ</button>`;
+        info += `<div class="ai" id="revAI"></div>`;
+      }
+    }
+    const ck=g.clk[p-1]; if (ck!=null) info += `<div class="small muted" style="margin-top:3px">الوقت المتبقي: <span class="ltr">${fmtClock(ck)}</span>${p>=3 && g.clk[p-3]!=null? ` • استغرقت <span class="ltr">${Math.max(0,(g.clk[p-3]-ck+g.inc)).toFixed(1)}</span> ث`:''}</div>`;
+  }
+  $('#revInfo').innerHTML=info;
+  const ex=$('#revExplain'); if (ex) ex.onclick=()=>{
+    const i=p-1; const bl=uciToSans(RV.fens[i], (g.pv[i]||g.bm[i]).split(' ').slice(0,5)); const ref=uciToSans(RV.fens[i+1], (g.pv[i+1]||'').split(' ').filter(Boolean).slice(0,4));
+    askAI(moveContextPrompt({fen:RV.fens[i], color:m.color, phase:m.phase, played:g.sans[i], wb:Math.round(m.wb), wa:Math.round(m.wa), best:bl[0], bestLine:bl.join(' '), refute:ref.join(' ')}), $('#revAI'), ex);
+  };
+  $$('#revMoves .m').forEach(d=>d.classList.toggle('cur', +d.dataset.p===p));
+  const cur=$('#revMoves .m.cur'); if (cur){ const box=$('#revMoves'); const top2=cur.offsetTop-box.offsetTop; if (top2<box.scrollTop || top2>box.scrollTop+box.clientHeight-30) box.scrollTop=top2-60; }
+  const gl=$('#gCur'); if (gl){ const n=g.ev.length; const xx=n<2?0:p*300/(n-1); gl.setAttribute('x1',xx); gl.setAttribute('x2',xx); }
+}
+function fmtClock(s){ const m=Math.floor(s/60), r=Math.floor(s%60); return `${m}:${String(r).padStart(2,'0')}`; }
+$$('[data-nav]').forEach(b=>b.onclick=()=>{ const a=b.dataset.nav; if(a==='first') goPly(0); if(a==='prev') goPly(RV.ply-1); if(a==='next') goPly(RV.ply+1); if(a==='last') goPly(RV.g.sans.length); if(a==='flip'){ RV.flip=!RV.flip; goPly(RV.ply); } });
+$('#revBack').onclick=()=>showTab('games');
+document.addEventListener('keydown', e=>{ if (curTab!=='review') return; if (e.key==='ArrowLeft') goPly(RV.ply+1); if (e.key==='ArrowRight') goPly(RV.ply-1); });
+
+/* ---------- training ---------- */
+const PZ = { active:false, list:[], idx:0, p:null, step:0, failed:false, hinted:false, done:false, board:null, filter:{}, sessionOk:0, sessionN:0, fen:null };
+function setFilter(f){ PZ.filter=f||{}; renderTrainHome(); }
+function filtered(){ const f=PZ.filter; return Object.values(Store.mem.puzzles).filter(p=>(!f.cat||p.cat===f.cat)&&(!f.phase||p.phase===f.phase)&&(!f.blunder||p.cls==='blunder')); }
+function renderTrainHome(){
+  if (PZ.active) return;
+  $('#trainPlay').style.display='none'; const el=$('#trainHome'); el.style.display='block';
+  const all=Object.values(Store.mem.puzzles); const now=Date.now();
+  if (!all.length){ el.innerHTML=`<div class="card empty"><div class="big">🧩</div><h2>لا توجد تمارين بعد</h2><p class="muted">بعد تحليل مبارياتك، كل خطأ أو خطأ فادح ارتكبته يتحول إلى تمرين هنا.</p><button class="btn primary" onclick="showTab('games')">إلى مبارياتي</button></div>`; updateBadge(); return; }
+  const F=filtered(); const due=F.filter(p=>p.due<=now); const mastered=all.filter(p=>p.box>=4).length; const tried=all.filter(p=>p.tries>0);
+  const chip=(label,f)=>{ const on=JSON.stringify(f)===JSON.stringify(PZ.filter); return `<button class="chip ${on?'on':''}" data-f='${JSON.stringify(f)}'>${label}</button>`; };
+  const catCount=k=>all.filter(p=>p.cat===k).length;
+  el.innerHTML = `<div class="card"><h2>تمارين من أخطائك</h2>
+    <div class="kpis" style="margin-bottom:10px"><div class="kpi"><b>${all.length}</b><span>تمرين من مبارياتك</span></div><div class="kpi"><b>${mastered}</b><span>أتقنته (ثابت في الذاكرة)</span></div>
+    <div class="kpi"><b>${tried.length? pct(tried.reduce((s,p)=>s+p.ok,0), tried.reduce((s,p)=>s+p.tries,0))+'%':'–'}</b><span>نسبة الحل الصحيح</span></div><div class="kpi"><b>${all.filter(p=>p.due<=now).length}</b><span>مستحق الآن</span></div></div>
+    <div class="chips">${chip('الكل',{})}${chip('أخطاء فادحة فقط',{blunder:true})}${Object.keys(CAT).filter(k=>catCount(k)).map(k=>chip(CAT[k]+' ('+catCount(k)+')',{cat:k})).join('')}${['o','m','e'].map(k=>chip(PHASE[k],{phase:k})).join('')}</div>
+    <button class="btn primary block" id="startDue" ${F.length?'':'disabled'}>${due.length? `ابدأ (${due.length} مستحق)` : (F.length? 'تمرّن على أي حال' : 'لا توجد تمارين بهذا التصنيف')}</button>
+    <p class="small muted" style="margin-bottom:0">كل تمرين تحلّه صح يبتعد موعده (يوم ← ٣ أيام ← أسبوع…)، وكل تمرين تخطئ فيه يرجع لك قريبًا. هكذا تُصلح العادة نفسها لا الموقف فقط.</p></div>
+    <div class="card"><h2>حسب النوع</h2>${Object.keys(CAT).map(k=>{ const L=all.filter(p=>p.cat===k); if(!L.length) return ''; const m=L.filter(p=>p.box>=3).length; return `<div class="statrow"><span>${CAT[k]}</span>${bar(pct(m,L.length),'var(--good)')}<span class="v">${m}/${L.length}</span></div>`; }).join('')}<div class="small muted">الشريط = نسبة ما تعلمته من كل نوع.</div></div>`;
+  el.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>setFilter(JSON.parse(b.dataset.f)));
+  $('#startDue').onclick=()=>startSession(PZ.filter);
+  updateBadge();
+}
+function startSession(f){
+  PZ.filter=f||{}; const now=Date.now(); let F=filtered();
+  let list=F.filter(p=>p.due<=now).sort((a,b)=>a.box-b.box||a.due-b.due);
+  if (!list.length) list=F.sort((a,b)=>a.box-b.box||a.due-b.due);
+  list=list.slice(0,20);
+  if (!list.length){ toast('لا توجد تمارين'); return; }
+  PZ.active=true; PZ.list=list; PZ.idx=0; PZ.sessionOk=0; PZ.sessionN=0;
+  $('#trainHome').style.display='none'; $('#trainPlay').style.display='block';
+  if (!PZ.board) PZ.board=new BoardView($('#pzBoard'));
+  Engine.init().catch(()=>{});
+  loadPuzzle();
+}
+function endSession(){ PZ.active=false; renderTrainHome(); updateBadge(); if (PZ.sessionN) toast(`أنهيت ${PZ.sessionN} تمرين • صحيح ${PZ.sessionOk}`); }
+$('#pzExit').onclick=endSession;
+function loadPuzzle(){
+  const p=PZ.list[PZ.idx]; if (!p){ endSession(); return; }
+  PZ.p=p; PZ.step=0; PZ.failed=false; PZ.hinted=false; PZ.done=false; PZ.fen=p.fen; PZ.checking=false;
+  $('#pzCount').textContent=`${PZ.idx+1} / ${PZ.list.length}`;
+  setMsg('info', `دورك بال${p.color==='w'?'أبيض':'أسود'} — جد أفضل نقلة${p.sol.length>1? ' (والمتابعة)':''}`);
+  $('#pzMeta').innerHTML = `<span class="tag">${CAT[p.cat]||''}</span><span class="tag">${PHASE[p.phase]||''}</span> من مباراتك ضد <span class="ltr">${esc(p.opp)}</span> (${esc((p.date||'').split(' ')[0])}). ${p.tries? `حاولته ${p.tries} مرة، صح ${p.ok}.`:'تمرين جديد.'}`;
+  $('#pzNext').style.display='none'; $('#pzShow').style.display=''; $('#pzHint').style.display=''; $('#pzExplain').style.display='none';
+  $('#pzAI').classList.remove('on'); $('#pzAI').textContent='';
+  drawPz();
+}
+function drawPz(extra={}){ PZ.board.set(PZ.fen, Object.assign({flip:PZ.p.color==='b', interactive:!PZ.done && !PZ.checking, color:PZ.p.color, onMove:pzMove}, extra)); }
+function setMsg(kind, html){ const m=$('#pzMsg'); m.className='fb '+kind; m.innerHTML=html; }
+async function pzMove(mv){
+  if (PZ.done || PZ.checking) return;
+  const p=PZ.p; const exp=p.sol[PZ.step];
+  let uci = mv.from+mv.to+(mv.promotion||'');
+  if (exp && mv.promotion && exp.slice(0,4)===uci.slice(0,4)) uci=exp;
+  const c=new Chess(PZ.fen); const m=c.move({from:uci.slice(0,2), to:uci.slice(2,4), promotion:uci[4]}); if (!m) return;
+  if (uci===exp || c.in_checkmate()){
+    PZ.fen=c.fen(); PZ.step++;
+    if (PZ.step>=p.sol.length || c.in_checkmate()){ return pzFinish(true, uci===exp? 'صحيح! 🎉' : 'كش مات! ممتاز 🎉', {from:m.from,to:m.to}); }
+    drawPz({last:{from:m.from,to:m.to}, interactive:false}); setMsg('ok','صحيح! أكمل…');
+    await sleep(450); const r=p.sol[PZ.step]; const m2=c.move({from:r.slice(0,2),to:r.slice(2,4),promotion:r[4]}); PZ.fen=c.fen(); PZ.step++;
+    if (PZ.step>=p.sol.length) return pzFinish(true,'صحيح! 🎉',{from:m2.from,to:m2.to});
+    drawPz({last:{from:m2.from,to:m2.to}}); setMsg('info','الخصم ردّ — ما هي نقلتك التالية؟'); return;
+  }
+  // alternative check with engine
+  PZ.checking=true; drawPz({last:{from:m.from,to:m.to}, interactive:false}); PZ.board.fen=c.fen(); PZ.board.render(); setMsg('info','أتحقق من نقلتك…');
+  let accept=false;
+  try {
+    if (Engine.ok || await Engine.init().then(()=>true).catch(()=>false)){
+      const [rb, ra] = [await Engine.analyze(PZ.fen, 11, 2500), await Engine.analyze(c.fen(), 11, 2500)];
+      const col=p.color; const wBest=wpFor(rb.cp,col), wAlt=wpFor(ra.cp,col);
+      accept = wAlt >= wBest - 3 && (PZ.step>0 || wAlt - p.wa >= 8);
+    }
+  } catch(e){}
+  PZ.checking=false;
+  if (accept){ const prev=PZ.fen; PZ.fen=c.fen(); return pzFinish(true,'نقلة بديلة قوية أيضًا ✔ (حل المحرك موضح بالسهم لثانيتين)', {from:m.from,to:m.to}, {fen:prev, mv:exp}); }
+  PZ.failed=true;
+  setMsg('bad', `ليست هذه. ${m.san===p.played && PZ.step===0? 'هذه نفس النقلة التي لعبتها في المباراة!':''} حاول مرة أخرى أو اضغط «أظهر الحل».`);
+  PZ.board.set(PZ.fen, {flip:p.color==='b', interactive:false, marks:{[m.to]:'bad'}, last:{from:m.from,to:m.to}});
+  PZ.board.chess=null; PZ.board.fen=c.fen(); PZ.board.render();
+  await sleep(800); drawPz();
+}
+function pzFinish(ok, msg, last, alt){
+  const p=PZ.p; PZ.done=true;
+  const success = ok && !PZ.failed && !PZ.hinted;
+  p.tries=(p.tries||0)+1; if (success) p.ok=(p.ok||0)+1;
+  if (success){ p.box=Math.min(5,(p.box||0)+1); } else { p.box=Math.max(0,(p.box||0)-2); }
+  p.due = Date.now() + INTERVALS[success? p.box : 0]*86400000 * (success?1:0.5);
+  p.last = Date.now(); Store.save('puzzles', p.id, p);
+  PZ.sessionN++; if (success) PZ.sessionOk++;
+  if (alt){ PZ.board.set(alt.fen, {flip:p.color==='b', arrows:[{from:alt.mv.slice(0,2),to:alt.mv.slice(2,4),c:'g'}]}); const f=PZ.fen; setTimeout(()=>{ if (PZ.p===p) PZ.board.set(f,{flip:p.color==='b', last}); },2000); }
+  else PZ.board.set(PZ.fen, {flip:p.color==='b', interactive:false, last});
+  const nextIn = success? (p.box>=5? 'أكثر من شهر' : ['٦ ساعات','يوم','٣ أيام','أسبوع','أسبوعين','شهر'][p.box]) : 'قريبًا';
+  setMsg(success? 'ok':'info', `${msg}<div class="small" style="font-weight:400;margin-top:4px">الحل: <span class="ltr">${esc(p.solSan.slice(0,Math.max(p.sol.length,3)).join(' '))}</span> • في المباراة لعبت <span class="ltr">${esc(p.played)}</span> (خسرت ${p.loss}٪ من فرص الفوز). سيعود هذا التمرين بعد ${nextIn}.</div>`);
+  $('#pzNext').style.display=''; $('#pzShow').style.display='none'; $('#pzHint').style.display='none';
+  if (AI) $('#pzExplain').style.display='';
+  updateBadge();
+}
+$('#pzNext').onclick=()=>{ PZ.idx++; loadPuzzle(); };
+$('#pzHint').onclick=()=>{ if (PZ.done) return; PZ.hinted=true; const e=PZ.p.sol[PZ.step]; drawPz({marks:{[e.slice(0,2)]:'hint'}}); setMsg('info', `تلميح: حرّك القطعة المحددة. <span class="small">(نوع التمرين: ${CAT[PZ.p.cat]})</span>`); };
+$('#pzShow').onclick=()=>{ if (PZ.done) return; PZ.failed=true; const e=PZ.p.sol[PZ.step]; const c=new Chess(PZ.fen); const m=c.move({from:e.slice(0,2),to:e.slice(2,4),promotion:e[4]}); PZ.board.set(PZ.fen,{flip:PZ.p.color==='b', arrows:[{from:e.slice(0,2),to:e.slice(2,4),c:'g'}]}); setTimeout(()=>{ PZ.fen=c.fen(); pzFinish(false,'هذا هو الحل — سيعود لك قريبًا لتثبيته', {from:m.from,to:m.to}); }, 1100); };
+$('#pzExplain').onclick=()=>{ const p=PZ.p; askAI(moveContextPrompt({fen:p.fen, color:p.color, phase:p.phase, played:p.played, wb:p.wb, wa:p.wa, best:p.solSan[0], bestLine:p.solSan.join(' '), refute:(p.refSan||[]).join(' ')}), $('#pzAI'), $('#pzExplain')); };
+$('#pzGame').onclick=()=>{ const p=PZ.p; PZ.active=false; openReview(p.gk, p.ply+1); };
+
+/* ---------- settings ---------- */
+function renderSettings(){
+  $('#setUser').value=Store.settings.username||''; $('#setDepth').value=String(Store.settings.depth||12);
+  const g=Object.keys(Store.mem.games).length, p=Object.keys(Store.mem.puzzles).length;
+  $('#dataInfo').textContent = `${g} مباراة • ${p} تمرين • محفوظة على هذا الجهاز. خذ نسخة احتياطية من وقت لآخر، وإذا حذفت التطبيق تقدر تسحب مبارياتك من جديد.`;
+  renderInstall();
+}
+$('#saveSet').onclick=()=>{
+  const before=userName(); Store.settings.username=$('#setUser').value.trim(); Store.settings.depth=+$('#setDepth').value; Store.saveSettings();
+  if (before!==userName()){ for (const g of Object.values(Store.mem.games)) if (g.ev) makePuzzles(g); }
+  toast('تم الحفظ ✔'); renderAll(); renderSettings();
+};
+$('#exportBtn').onclick=async()=>{ const data=JSON.stringify({v:1, settings:Store.settings, games:Store.mem.games, puzzles:Store.mem.puzzles}); try { await navigator.clipboard.writeText(data); toast('نُسخت النسخة الاحتياطية — الصقها في ملاحظاتك'); } catch(e){ const a=$('#bkArea'); a.style.display='block'; a.value=data; a.select(); toast('انسخ النص من المربع'); } };
+$('#importBkBtn').onclick=()=>{ const a=$('#bkArea'); if (a.style.display!=='block' || !a.value.trim()){ a.style.display='block'; a.value=''; a.focus(); toast('الصق النسخة ثم اضغط «استعادة نسخة» مرة أخرى'); return; }
+  try { const d=JSON.parse(a.value); let n=0; for (const k in (d.games||{})) { Store.save('games',k,d.games[k]); n++; } for (const k in (d.puzzles||{})) Store.save('puzzles',k,d.puzzles[k]); if (d.settings) { Object.assign(Store.settings,d.settings); Store.saveSettings(); } a.value=''; a.style.display='none'; toast(`استُعيدت ${n} مباراة ✔`); renderAll(); renderSettings(); } catch(e){ toast('النص غير صالح'); } };
+$('#wipeBtn').onclick=()=>{ $('#wipeConfirm').style.display='flex'; };
+$('#wipeNo').onclick=()=>{ $('#wipeConfirm').style.display='none'; };
+$('#wipeYes').onclick=()=>{ for (const k of Object.keys(Store.mem.games)) Store.del('games',k); for (const k of Object.keys(Store.mem.puzzles)) Store.del('puzzles',k); $('#wipeConfirm').style.display='none'; toast('حُذفت البيانات'); renderAll(); renderSettings(); };
+
+/* ================= chess.com import ================= */
+async function fetchChessCom(){
+  const u=$('#ccUser').value.trim().toLowerCase(); if(!u){ toast('اكتب اسم حسابك'); return; }
+  const months=+$('#ccMonths').value, type=$('#ccType').value, st=$('#ccStatus'), btn=$('#ccFetch');
+  btn.disabled=true; st.textContent='أتصل بتشز دوت كوم…';
+  try {
+    const r=await fetch(`https://api.chess.com/pub/player/${encodeURIComponent(u)}/games/archives`);
+    if (r.status===404) throw new Error('لم أجد حسابًا بهذا الاسم');
+    if (!r.ok) throw new Error('تشز دوت كوم لم يرد ('+r.status+')');
+    const arch=((await r.json()).archives||[]).slice(-months).reverse();
+    if (!arch.length) throw new Error('لا توجد مباريات في هذا الحساب');
+    let pgns=[], n=0;
+    for (const url of arch){
+      n++; st.textContent=`أحمّل شهر ${n} من ${arch.length}…`;
+      const rr=await fetch(url); if (!rr.ok) continue;
+      const js=await rr.json();
+      for (const g of (js.games||[])){
+        if (g.rules && g.rules!=='chess') continue;
+        if (type==='all' ? g.time_class==='daily' : g.time_class!==type) continue;
+        if (g.pgn) pgns.push(g.pgn);
+      }
+      await sleep(150);
+    }
+    if (!Store.settings.username){ Store.settings.username=u; Store.saveSettings(); }
+    if (!pgns.length){ st.textContent='لا توجد مباريات من هذا النوع في الفترة المختارة.'; return; }
+    const ks=doImport(pgns.join('\n\n'));
+    st.innerHTML = ks.length? `أُضيفت ${ks.length} مباراة جديدة. <a href="#" id="ccAn" style="color:var(--accent)">حلّلها الآن</a>` : 'كل هذه المباريات موجودة عندك مسبقًا ✔';
+    const an=$('#ccAn'); if (an) an.onclick=e=>{ e.preventDefault(); analyzeGames(ks.map(k=>Store.mem.games[k]).sort(byDate).map(g=>g.key)); };
+  } catch(e){ st.textContent = navigator.onLine? ('تعذّر السحب: '+(e.message||e)) : 'تحتاج اتصال إنترنت لسحب المباريات.'; }
+  finally { btn.disabled=false; }
+}
+$('#ccFetch').onclick=fetchChessCom;
+
+/* ================= install (PWA) ================= */
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferredPrompt=e; renderInstall(); });
+window.addEventListener('appinstalled', ()=>{ deferredPrompt=null; toast('تم تثبيت التطبيق ✔'); renderInstall(); });
+function isStandalone(){ return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone===true; }
+function renderInstall(){
+  const el=$('#installBody'); if (!el) return;
+  if (isStandalone()){ $('#installCard').style.display='none'; return; }
+  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  if (deferredPrompt){ el.innerHTML='<p style="margin-top:0">ثبّته كتطبيق: يفتح بملء الشاشة ويشتغل بدون إنترنت.</p><button class="btn primary block" id="instBtn">تثبيت التطبيق</button>';
+    $('#instBtn').onclick=async()=>{ deferredPrompt.prompt(); try{ await deferredPrompt.userChoice; }catch(e){} deferredPrompt=null; renderInstall(); }; }
+  else if (ios) el.innerHTML='<ol class="steps" style="margin:0"><li>افتح هذه الصفحة في <b>Safari</b>.</li><li>اضغط زر المشاركة (المربع والسهم).</li><li>اختر <b>إضافة إلى الشاشة الرئيسية</b> ← إضافة.</li></ol>';
+  else el.innerHTML='<ol class="steps" style="margin:0"><li>افتح هذه الصفحة في <b>Chrome</b>.</li><li>اضغط ⋮ أعلى الشاشة.</li><li>اختر <b>تثبيت التطبيق</b> (أو إضافة إلى الشاشة الرئيسية).</li></ol>';
+}
+if ('serviceWorker' in navigator) window.addEventListener('load', ()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw', e)));
+
+/* ================= boot ================= */
+(async function boot(){
+  await withTimeout(window.chessLibReady, 20000);
+  if (typeof Chess==='undefined'){ $('#v-home').innerHTML='<div class="card fb bad">تعذّر تحميل مكتبة الشطرنج. تأكد من اتصالك بالإنترنت ثم أعد فتح الصفحة.</div>'; return; }
+  await Store.initLocal(); updateSavePill(); renderAll(); renderInstall();
+  if (Store.settings.username) $('#ccUser').value=Store.settings.username;
+  setTimeout(()=>Engine.init().catch(()=>{}), 800);
+})();
+</script>
+</body>
+</html>
