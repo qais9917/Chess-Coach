@@ -475,7 +475,7 @@ const Engine = {
     });
   },
   newGame(){ return this._job(() => new Promise(res => { this.handler = l => { if (l==='readyok'){ this.handler=null; res(); } }; this.w.postMessage('ucinewgame'); this.w.postMessage('isready'); })); },
-  analyze(fen, depth, movetime=3500){
+  analyze(fen, depth, movetime=3500, searchmoves){
     return this._job(() => new Promise(res => {
       const turn = fen.split(' ')[1]; let last={cp:0, pv:[], depth:0};
       this.handler = line => {
@@ -489,7 +489,7 @@ const Engine = {
         }
       };
       this.w.postMessage('position fen '+fen);
-      this.w.postMessage(`go depth ${depth} movetime ${movetime}`);
+      this.w.postMessage(`go depth ${depth} movetime ${movetime}` + (searchmoves? ' searchmoves '+searchmoves : ''));
     }));
   },
   _job(fn){ const p = this.chain.then(() => this.init()).then(fn); this.chain = p.catch(()=>{}); return p; }
@@ -509,7 +509,7 @@ function classify(g){
   if (!g.ev) return null;
   const out=[]; const n=g.ucis.length;
   for (let i=0;i<n;i++){
-    const color = colorAt(g,i); const a=g.ev[i], b=g.ev[i+1];
+    const color = colorAt(g,i); const a=g.ev[i], b=(g.pm && g.pm[i]!=null)? g.pm[i] : g.ev[i+1];
     if (a==null || b==null){ out.push(null); continue; }
     const wb=wpFor(a,color), wa=wpFor(b,color); const loss=Math.max(0, wb-wa);
     let cls;
@@ -541,20 +541,21 @@ async function analyzeGames(keys){
     if (AN.stop) break;
     const g = Store.mem.games[k]; const fens=fensOf(g); const n=fens.length;
     $('#anTitle').textContent = `تحليل المباراة ${done+1} من ${keys.length}`;
-    const ev=new Array(n).fill(null), bm=new Array(n).fill(null), pv=new Array(n).fill('');
+    const ev=new Array(n).fill(null), bm=new Array(n).fill(null), pv=new Array(n).fill(''), pm=new Array(n).fill(null);
     await Engine.newGame();
     const t0=Date.now();
     for (let i=0;i<n;i++){
       if (AN.stop) break;
       const te = terminalEval(fens[i]);
       if (te!=null){ ev[i]=te; }
-      else { const r = await Engine.analyze(fens[i], depth); ev[i]=r.cp; bm[i]=r.best; pv[i]=r.pv.slice(0,6).join(' '); }
+      else { const r = await Engine.analyze(fens[i], depth); ev[i]=r.cp; bm[i]=r.best; pv[i]=r.pv.slice(0,6).join(' ');
+        if (i<n-1){ if (r.best===g.ucis[i]) pm[i]=r.cp; else { const r2=await Engine.analyze(fens[i], depth, 3500, g.ucis[i]); pm[i]=r2.cp; } } }
       const fr=(i+1)/n; $('#anBar').style.width = (100*(done+fr)/keys.length)+'%';
       const el=(Date.now()-t0)/1000, eta=Math.round(el/fr - el);
       $('#anSub').textContent = `${g.white} ضد ${g.black} — الموقف ${i+1}/${n}` + (i>3? ` — متبقٍ تقريبًا ${eta} ث` : '');
     }
     if (AN.stop) break;
-    Object.assign(g, {ev, bm, pv, depth, analyzedAt:Date.now()});
+    Object.assign(g, {ev, bm, pv, pm, depth, analyzedAt:Date.now(), v:2});
     Store.save('games', k, g);
     makePuzzles(g);
     done++;
@@ -786,7 +787,7 @@ function renderGames(){
   }).join('') + (list.length>300? `<div class="small muted">يُعرض أحدث 300 مباراة.</div>`:'');
   el.querySelectorAll('.game').forEach(d=>d.onclick=e=>{ const an=e.target.closest('[data-an]'); if (an){ e.stopPropagation(); analyzeGames([an.dataset.an]); return; } openReview(d.dataset.k); });
 }
-$('#analyzeAll').onclick=()=>{ const ks=Object.values(Store.mem.games).filter(g=>!g.ev || g.depth<(+Store.settings.depth||12)-2).sort(byDate).map(g=>g.key); if(!ks.length){ toast('كل المباريات محللة ✔'); return; } analyzeGames(ks); };
+$('#analyzeAll').onclick=()=>{ const ks=Object.values(Store.mem.games).filter(g=>!g.ev || !g.pm || g.depth<(+Store.settings.depth||12)-2).sort(byDate).map(g=>g.key); if(!ks.length){ toast('كل المباريات محللة ✔'); return; } analyzeGames(ks); };
 $('#anStop').onclick=()=>{ AN.stop=true; };
 
 function doImport(text){
